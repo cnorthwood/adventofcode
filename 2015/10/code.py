@@ -1,6 +1,3 @@
-from itertools import permutations
-import re
-
 INPUT = "1113222113"
 
 def expand(input):
