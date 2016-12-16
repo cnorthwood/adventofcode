@@ -1,7 +1,9 @@
 import itertools
 
 INITIAL_FLOORS = (
-    frozenset([('polonium', 'generator'), ('thulium', 'generator'), ('thulium', 'microchip'), ('promethium', 'generator'), ('ruthenium', 'generator'), ('ruthenium', 'microchip'), ('cobalt', 'generator'), ('cobalt', 'microchip')]),
+    frozenset([('polonium', 'generator'), ('thulium', 'generator'), ('thulium', 'microchip'), ('promethium', 'generator'),
+               ('ruthenium', 'generator'), ('ruthenium', 'microchip'), ('cobalt', 'generator'), ('cobalt', 'microchip'),
+               ('elerium', 'generator'), ('elerium', 'microchip'), ('dilithium', 'generator'), ('dilithium', 'microchip')]),
     frozenset([('polonium', 'microchip'), ('promethium', 'microchip')]),
     frozenset(),
     frozenset()
