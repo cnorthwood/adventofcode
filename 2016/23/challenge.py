@@ -1,9 +1,10 @@
 REGISTERS = {
     'a': 0,
     'b': 0,
-    'c': 0,
+    'c': 1,
     'd': 0,
 }
+
 
 def deref(x):
     if x.isdigit():
@@ -51,4 +52,4 @@ while pc < len(INSTRUCTIONS):
     op, args = INSTRUCTIONS[pc]
     pc += op(*args)
 
-print "Part One:", REGISTERS['a']
+print "Part Two:", REGISTERS['a']
