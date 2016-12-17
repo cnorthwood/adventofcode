@@ -45,17 +45,19 @@ def generate_options((current_floor, floors)):
                 floors[:current_floor] + (frozenset(floors[current_floor] - new_items), frozenset(floors[current_floor+1] | new_items)) + floors[current_floor+2:]
             )
 
-
 i = 0
 options = {(0, INITIAL_FLOORS)}
+seen_options = set(options)
 while not any(completed(option) for option in options):
     i += 1
     print "Iteration {}: {} to check".format(i, len(options))
     next_options = set()
     for option in options:
         next_options |= frozenset(filter(stable, generate_options(option)))
+    next_options -= seen_options
+    seen_options |= next_options
     options = next_options
     if len(options) == 0:
         break
 
-print "Part One:", i
+print "Part Two:", i
