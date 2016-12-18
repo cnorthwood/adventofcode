@@ -5,9 +5,20 @@ import re
 SALT = 'ihaygndm'
 TRIP_MATCH = re.compile(r'(?P<c>.)(?P=c)(?P=c)')
 
+def memoize(f):
+    results = {}
+    def memoized(i):
+        if i not in results:
+            results[i] = f(i)
+        return results[i]
+    return memoized
 
+@memoize
 def genhash(i):
-    return md5(SALT + str(i)).hexdigest()
+    hashed = md5(SALT + str(i)).hexdigest()
+    for _ in range(2016):
+        hashed = md5(hashed).hexdigest()
+    return hashed
 
 
 def in_next_1000(char, i):
@@ -24,5 +35,5 @@ for i in count():
     if match and in_next_1000(match.group('c'), i):
         found += 1
     if found == 64:
-        print "Part One:", i
+        print "Part Two:", i
         break
