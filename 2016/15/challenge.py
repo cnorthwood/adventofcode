@@ -20,3 +20,10 @@ for t in count():
     if all(is_open(disc, t + i + 1) for i, disc in enumerate(DISCS)):
         print "Part One:", t
         break
+
+DISCS.append(Disc(0, 11))
+
+for t in count():
+    if all(is_open(disc, t + i + 1) for i, disc in enumerate(DISCS)):
+        print "Part Two:", t
+        break
