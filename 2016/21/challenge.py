@@ -25,7 +25,7 @@ ROTATE_RE = re.compile(r'rotate (?P<direction>left|right) (?P<x>\d+) steps?')
 def rotate(password, direction, x):
     password = deque(password)
     x = int(x)
-    if direction == 'left':
+    if direction == 'right':
         x = -x
     password.rotate(x)
     return ''.join(password)
@@ -35,10 +35,17 @@ ROTATE_POSITION_RE = re.compile(r'rotate based on position of letter (?P<x>\w+)'
 def rotate_position(password, x):
     i = password.index(x)
     password = deque(password)
-    if i >= 4:
-        i += 1
-    i += 1
-    password.rotate(i)
+    rotations = {
+        0: -1,
+        1: -1,
+        2: 2,
+        3: -2,
+        4: 1,
+        5: -3,
+        6: 0,
+        7: 4
+    }
+    password.rotate(rotations[i])
     return ''.join(password)
 
 
@@ -53,23 +60,23 @@ MOVE_RE = re.compile(r'move position (?P<x>\d+) to position (?P<y>\d+)')
 def move(password, x, y):
     x = int(x)
     y = int(y)
-    new_password = password[:x] + password[x+1:]
-    new_password = new_password[:y] + password[x] + new_password[y:]
+    new_password = password[:y] + password[y+1:]
+    new_password = new_password[:x] + password[y] + new_password[x:]
     return new_password
 
 
-assert swap_pos('abcde', '4', '0') == 'ebcda'
-assert swap_letter('ebcda', 'd', 'b') == 'edcba'
-assert reverse_pos('edcba', '0', '4') == 'abcde'
-assert rotate('abcde', 'left', '1') == 'bcdea'
-assert move('bcdea', '1', '4') == 'bdeac'
-assert move('bdeac', '3', '0') == 'abdec'
-assert rotate_position('abdec', 'b') == 'ecabd'
-assert rotate_position('ecabd', 'd') == 'decab'
+assert swap_pos('ebcda', '4', '0') == 'abcde'
+assert swap_letter('edcba', 'd', 'b') == 'ebcda'
+assert reverse_pos('abcde', '0', '4') == 'edcba'
+assert rotate('bcdea', 'left', '1') == 'abcde'
+assert move('bdeac', '1', '4') == 'bcdea'
+assert move('abdec', '3', '0') == 'bdeac'
+# assert rotate_position('ecabd', 'b') == 'abdec'
+# assert rotate_position('decab', 'd') == 'ecabd'
 
 with open('input.txt') as input:
-    password = 'abcdefgh'
-    for line in input:
+    password = 'fbgdceah'
+    for line in reversed(list(input)):
         swap_pos_match = SWAP_POS_RE.match(line)
         if swap_pos_match:
             password = swap_pos(password, **swap_pos_match.groupdict())
@@ -101,4 +108,4 @@ with open('input.txt') as input:
             continue
 
 
-print "Part One:", password
+print "Part Two:", password
