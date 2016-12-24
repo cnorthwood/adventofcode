@@ -51,7 +51,7 @@ BEST_PATHS = defaultdict(lambda: defaultdict(lambda: float("inf")))
 
 while not QUEUE.empty():
     d, next_best = QUEUE.get()
-    if len(next_best.left_to_visit) == 0:
+    if len(next_best.left_to_visit) == 0 and next_best.current_loc == START:
         if SHORTEST:
             SHORTEST = min(SHORTEST, next_best.steps_so_far)
         else:
@@ -66,4 +66,4 @@ while not QUEUE.empty():
         BEST_PATHS[new_state.current_loc][new_state.left_to_visit] = new_state.steps_so_far
         QUEUE.put((p, new_state))
 
-print "Part One:", SHORTEST
+print "Part Two:", SHORTEST
