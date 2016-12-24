@@ -11,7 +11,7 @@ State = namedtuple('State', 'current_loc steps_so_far left_to_visit')
 
 
 def priority(state):
-    return state.steps_so_far + min(abs(x - state.current_loc[0]) + abs(y - state.current_loc[1]) for x, y in TARGET_NODES)
+    return state.steps_so_far + min(abs(x - state.current_loc[0]) + abs(y - state.current_loc[1]) for x, y in TARGET_NODES - state.left_to_visit)
 
 
 def generate_options(((x, y), steps_so_far, left_to_visit)):
@@ -51,9 +51,7 @@ BEST_PATHS = defaultdict(lambda: defaultdict(lambda: float("inf")))
 
 while not QUEUE.empty():
     d, next_best = QUEUE.get()
-    print QUEUE.qsize(), d, next_best
     if len(next_best.left_to_visit) == 0:
-        print "Found new candidate", next_best
         if SHORTEST:
             SHORTEST = min(SHORTEST, next_best.steps_so_far)
         else:
