@@ -1,9 +1,4 @@
-REGISTERS = {
-    'a': 12,
-    'b': 0,
-    'c': 0,
-    'd': 0,
-}
+from itertools import count
 
 
 def isdigit(x):
@@ -59,6 +54,11 @@ def tgl(x):
     return 1
 
 
+def out(x):
+    OUTPUT.append(deref(x))
+    return 1
+
+
 def mult_lookahead(instructions):
     if [op for op, args in instructions] == [inc, dec, jnz, dec, jnz]:
         reg_a = instructions[1][1][0]
@@ -83,19 +83,31 @@ OPS = {
     'dec': dec,
     'jnz': jnz,
     'tgl': tgl,
+    'out': out,
 }
 
-INSTRUCTIONS = []
+ORIGINAL_INSTRUCTIONS = []
 with open('input.txt') as input:
     for line in input:
         parts = line.split()
-        INSTRUCTIONS.append((OPS[parts[0]], parts[1:]))
-pc = 0
+        ORIGINAL_INSTRUCTIONS.append((OPS[parts[0]], parts[1:]))
 
-while pc < len(INSTRUCTIONS):
-    op, args = INSTRUCTIONS[pc]
-    if mult_lookahead(INSTRUCTIONS[pc:pc+5]):
-        op, args = mult_opt, INSTRUCTIONS[pc:pc+5]
-    pc += op(*args)
-
-print "Part Two:", REGISTERS['a']
+for i in count():
+    OUTPUT = []
+    REGISTERS = {
+        'a': i,
+        'b': 0,
+        'c': 0,
+        'd': 0,
+    }
+    INSTRUCTIONS = ORIGINAL_INSTRUCTIONS[:]
+    pc = 0
+    while pc < len(INSTRUCTIONS):
+        op, args = INSTRUCTIONS[pc]
+        if mult_lookahead(INSTRUCTIONS[pc:pc+5]):
+            op, args = mult_opt, INSTRUCTIONS[pc:pc+5]
+        pc += op(*args)
+        if OUTPUT == [0, 1, 0, 1, 0, 1, 0, 1, 0, 1] or OUTPUT == [1, 0, 1, 0, 1, 0, 1, 0, 1, 0]:
+            print "Part One:", i
+        if len(OUTPUT) >= 10:
+            break
