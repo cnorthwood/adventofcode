@@ -1,9 +1,17 @@
 #!/usr/bin/env python3
 
+from itertools import permutations
+
 TEST = """
 5 1 9 5
 7 5 3
 2 4 6 8
+"""
+
+TEST2 = """
+5 9 2 8
+9 4 7 3
+3 8 6 5
 """
 
 INPUT = """
@@ -26,15 +34,27 @@ INPUT = """
 """
 
 
-def checksum(input):
+def checksum_max_min_line(nums):
+    nums = list(nums)
+    return max(nums) - min(nums)
+
+
+def checksum_evenly_divisible_line(nums):
+    for (num1, num2) in permutations(nums, 2):
+        if num1 % num2 == 0:
+            return int(num1 / num2)
+
+
+def checksum(input, line_checksum_func):
     line_checksums = []
     for line in input.splitlines():
         if not line: continue
-        nums = list(map(int, line.split()))
-        line_checksums.append(max(nums) - min(nums))
+        line_checksums.append(line_checksum_func(map(int, line.split())))
     return sum(line_checksums)
 
 
-assert checksum(TEST) == 18
+assert checksum(TEST, checksum_max_min_line) == 18
+print("Part 1:", checksum(INPUT, checksum_max_min_line))
 
-print("Part 1:", checksum(INPUT))
+assert checksum(TEST2, checksum_evenly_divisible_line) == 9
+print("Part 2:", checksum(INPUT, checksum_evenly_divisible_line))
