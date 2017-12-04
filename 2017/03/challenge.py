@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from sys import maxsize
 
 INPUT = 289326
 
@@ -62,3 +63,33 @@ assert steps_to_origin(23, offsets) == 2
 assert steps_to_origin(1024, offsets) == 31
 
 print("Part One:", steps_to_origin(INPUT, offsets))
+
+
+def calculate(n):
+    offsets = main(n)
+    results = {
+        (0, 0): 1,
+    }
+    for i in range(2, n + 1):
+        x, y = offsets[i]
+        results[(x, y)] = results.get((x - 1, y - 1), 0) \
+            + results.get((x, y - 1), 0) \
+            + results.get((x + 1, y - 1), 0) \
+            + results.get((x - 1, y), 0) \
+            + results.get((x + 1, y), 0) \
+            + results.get((x - 1, y + 1), 0) \
+            + results.get((x, y + 1), 0) \
+            + results.get((x + 1, y + 1), 0)
+    return results[offsets[n]]
+
+
+assert calculate(1) == 1
+assert calculate(2) == 1
+assert calculate(3) == 2
+assert calculate(4) == 4
+assert calculate(5) == 5
+
+for n in range(1, maxsize):
+    if calculate(n) > INPUT:
+        print("Part 2:", calculate(n))
+        break
