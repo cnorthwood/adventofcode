@@ -7,22 +7,13 @@ def ring_size(i):
     return (4 * (2 * i - 1)) - 4
 
 
-def middles(ring_start, ring_i):
+def find_corners(ring_start, ring_i):
+    ring_start -= 1
     quarter_size = ring_size(ring_i) // 4
-    first_middle = ring_start + ring_i - 2
-    return first_middle, first_middle + quarter_size, first_middle + 2 * quarter_size, first_middle + 3 * quarter_size
+    return ring_start + quarter_size, ring_start + quarter_size * 2, ring_start + quarter_size * 3
 
 
-def distance_to_closest_middle(n, middles):
-    return min([
-        abs(n - middles[0]),
-        abs(n - middles[1]),
-        abs(n - middles[2]),
-        abs(n - middles[3]),
-    ])
-
-
-def distance(n):
+def find_ring(n):
     if n == 1:
         return 0
     ring_start = 1
@@ -32,12 +23,42 @@ def distance(n):
         ring_i += 1
         ring_start = ring_end + 1
         ring_end += ring_size(ring_i)
-    return ring_i - 1 + distance_to_closest_middle(n, middles(ring_start, ring_i))
+    return ring_end + 1, find_corners(ring_start, ring_i)
 
 
-assert distance(1) == 0
-assert distance(12) == 3
-assert distance(23) == 2
-assert distance(1024) == 31
+def main(size):
+    offsets = [None, (0, 0)]
+    direction = (1, 0)
+    location = (0, 0)
+    ring_start = 2
+    corners = (None, None, None)
 
-print("Part 1:", distance(INPUT))
+    for n in range(2, size + 2):
+        location = (location[0] + direction[0], location[1] + direction[1])
+        offsets.append(location)
+
+        # figure next direction
+        if n == ring_start:
+            direction = (0, 1)
+            ring_start, corners = find_ring(n)
+        elif n == corners[0]:
+            direction = (-1, 0)
+        elif n == corners[1]:
+            direction = (0, -1)
+        elif n == corners[2]:
+            direction = (1, 0)
+
+    return offsets
+
+
+def steps_to_origin(n, offsets):
+    return abs(offsets[n][0]) + abs(offsets[n][1])
+
+
+offsets = main(INPUT)
+assert steps_to_origin(1, offsets) == 0
+assert steps_to_origin(12, offsets) == 3
+assert steps_to_origin(23, offsets) == 2
+assert steps_to_origin(1024, offsets) == 31
+
+print("Part One:", steps_to_origin(INPUT, offsets))
