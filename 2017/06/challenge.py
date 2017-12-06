@@ -32,7 +32,7 @@ assert rebalance([1, 3, 4, 1]) == [2, 4, 1, 2]
 
 def find_loop(blocks):
     balances = 0
-    seen = set()
+    seen = { ','.join(map(str, blocks)) }
     while True:
         blocks = rebalance(blocks)
         balances += 1
@@ -40,9 +40,17 @@ def find_loop(blocks):
         if blocks_str in seen:
             break
         seen.add(blocks_str)
-    return balances
+    return balances, blocks
 
 
-assert find_loop([0, 2, 7, 0]) == 5
+assert find_loop([0, 2, 7, 0]) == (5, [2, 4, 1, 2])
+assert find_loop([2, 4, 1, 2]) == (4, [2, 4, 1, 2])
 
-print("Part One:", find_loop(INPUT))
+
+to_first_loop, loop_start = find_loop(INPUT)
+
+print("Part One:", to_first_loop)
+
+to_second_loop, loop_start = find_loop(loop_start)
+
+print("Part Two:", to_second_loop)
