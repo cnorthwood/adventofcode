@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from collections import defaultdict, namedtuple
+from collections import Counter, defaultdict, namedtuple
 import re
 
 TEST = """
@@ -48,7 +48,45 @@ def find_root(nodes):
             return node
 
 
-assert find_root(parse_nodes(TEST)) == 'tknk'
+TEST_NODES = list(parse_nodes(TEST))
+TEST_NODES_BY_ID = { node.id: node for node in TEST_NODES }
+assert find_root(TEST_NODES) == 'tknk'
 
 with open('input.txt') as input_file:
-    print("Part One:", find_root(parse_nodes(input_file.readlines())))
+    NODES = list(parse_nodes(input_file.readlines()))
+print("Part One:", find_root(NODES))
+
+NODES_BY_ID = {node.id: node for node in NODES}
+
+
+def node_weight(node_id, nodes_by_id):
+    return nodes_by_id[node_id].weight + sum(node_weight(child, nodes_by_id) for child in nodes_by_id[node_id].children)
+
+
+assert node_weight('ugml', TEST_NODES_BY_ID) == 251
+assert node_weight('padx', TEST_NODES_BY_ID) == 243
+assert node_weight('fwft', TEST_NODES_BY_ID) == 243
+
+
+def find_different(items):
+    counter = Counter()
+    counter.update(items)
+    if len(counter) != 2:
+        return None, None
+    else:
+        return items.index(counter.most_common()[-1][0]), counter.most_common()[0][0]
+
+
+assert find_different([0, 0, 2, 0]) == (2, 0)
+
+
+def find_unbalanced(root, nodes_by_id, sibling_weight):
+    child_weights = [node_weight(child, nodes_by_id) for child in nodes_by_id[root].children]
+    different_child_i, expected = find_different(child_weights)
+    if different_child_i is None:
+        return nodes_by_id[root].weight - node_weight(root, nodes_by_id) + sibling_weight
+    else:
+        return find_unbalanced(nodes_by_id[root].children[different_child_i], nodes_by_id, expected)
+
+assert find_unbalanced(find_root(TEST_NODES), TEST_NODES_BY_ID, 0) == 60
+print("Part Two:", find_unbalanced(find_root(NODES), NODES_BY_ID, 0))
