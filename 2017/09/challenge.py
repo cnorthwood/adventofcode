@@ -46,3 +46,37 @@ with open('input.txt') as input:
     INPUT = input.read().strip()
 
 print("Part One:", parse_group(INPUT, 0)[0])
+
+
+def count_garbage(input):
+    garbage_chars = 0
+    in_garbage = False
+    while input:
+        c, input = input[0], input[1:]
+        if c == '!':
+            input = input[1:]
+            continue
+
+        if in_garbage:
+            if c == '>':
+                in_garbage = False
+                continue
+            else:
+                garbage_chars += 1
+                continue
+
+        elif c == '<':
+            in_garbage = True
+
+    return garbage_chars
+
+
+assert count_garbage('<>') == 0
+assert count_garbage('<random characters>') == 17
+assert count_garbage('<<<<>') == 3
+assert count_garbage('<{!>}>') == 2
+assert count_garbage('<!!>') == 0
+assert count_garbage('<!!!>>') == 0
+assert count_garbage('<{o"i!a,<{i<a>') == 10
+
+print("Part Two:", count_garbage(INPUT))
