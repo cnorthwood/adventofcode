@@ -68,4 +68,6 @@ assert distance(['ne', 'ne', 's', 's']) == 2
 assert distance(['se', 'sw', 'se', 'sw', 'sw']) == 3
 
 with open('input.txt') as input:
-    print("Part One:", distance(input.read().strip().split(',')))
+    INPUT = input.read().strip().split(',')
+print("Part One:", distance(INPUT))
+print("Part Two:", max(distance(INPUT[:i]) for i in range(len(INPUT))))
