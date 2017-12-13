@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+from itertools import count
+
+TEST_RANGES = {0: 3, 1: 2, 4: 4, 6: 4}
+
 
 def scanner_location(depth, picosecond, ranges):
     if depth not in ranges:
@@ -9,8 +13,8 @@ def scanner_location(depth, picosecond, ranges):
     return sequence[picosecond % len(sequence)]
 
 
-assert scanner_location(0, 0, {0: 3}) == 0
-assert scanner_location(6, 6, {6: 4}) == 0
+assert scanner_location(0, 0, TEST_RANGES) == 0
+assert scanner_location(6, 6, TEST_RANGES) == 0
 
 
 def severity(packet_depth, picosecond, ranges):
@@ -20,11 +24,29 @@ def severity(packet_depth, picosecond, ranges):
         return 0
 
 
-def total_severity(ranges):
+def total_severity(ranges,):
     return sum(severity(picosecond, picosecond, ranges) for picosecond in range(max(ranges.keys()) + 1))
 
 
-assert total_severity({0: 3, 1: 2, 4: 4, 6: 4}) == 24
+assert total_severity(TEST_RANGES) == 24
+
+
+def is_caught(ranges, delay):
+    for picosecond in range(max(ranges.keys()) + 1):
+        if scanner_location(picosecond, picosecond + delay, ranges) == 0:
+            return True
+    else:
+        return False
+
+
+def find_crossing_delay(ranges):
+    for delay in count():
+        if not is_caught(ranges, delay):
+            return delay
+
+
+assert find_crossing_delay(TEST_RANGES) == 10
+
 
 with open('input.txt') as input_file:
     RANGES = {}
@@ -33,3 +55,4 @@ with open('input.txt') as input_file:
         RANGES[depth] = rng
 
 print("Part One:", total_severity(RANGES))
+print("Part Two:", find_crossing_delay(RANGES))
