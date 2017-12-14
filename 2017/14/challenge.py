@@ -1,9 +1,14 @@
-#!/usr/bin/env python3
+#!/usr/bin/env pypy3
 
-INPUT = "hwlqcszp"
+INPUT = 'hwlqcszp'
+TEST_INPUT = 'flqrgnkx'
+
 
 from functools import reduce
 from itertools import chain
+from sys import setrecursionlimit
+
+setrecursionlimit(128 * 128)
 
 
 def rotate(start, length, data):
@@ -61,14 +66,51 @@ BITS = {
 }
 
 
-def active_in_row(row):
-    bits = ''.join(chain(BITS[c] for c in row))
-    return len(list(filter(lambda bit: bit == '1', bits)))
+def build_row(row):
+    return ''.join(chain(BITS[c] for c in row))
 
 
-def active(input):
-    return sum(active_in_row(knot_hash('{}-{}'.format(input, i))) for i in range(128))
+def active(grid):
+    return len(list(filter(lambda bit: bit == '1', grid.values())))
 
 
-assert active('flqrgnkx') == 8108
-print("Part One:", active(INPUT))
+def build_grid(input):
+    return {(x, y): bit for y in range(128) for x, bit in enumerate(build_row(knot_hash('{}-{}'.format(input, y))))}
+
+
+def find_connected(start, group, grid):
+    group.add(start)
+    x, y = start
+    neighbours = [
+        (x - 1, y),
+        (x, y - 1),
+        (x, y + 1),
+        (x + 1, y),
+    ]
+    for neighbour in neighbours:
+        if neighbour in grid and neighbour not in group and grid[neighbour] == '1':
+            find_connected(neighbour, group, grid)
+
+
+def group_all(grid):
+    groups = {}
+    group_count = 0
+    for x in range(128):
+        for y in range(128):
+            if grid[(x, y)] == '1' and (x, y) not in groups:
+                group_count += 1
+                group = set()
+                find_connected((x, y), group, grid)
+                for member in group:
+                    groups[member] = group_count
+    return group_count
+
+
+GRID = build_grid(INPUT)
+TEST_GRID = build_grid(TEST_INPUT)
+
+assert active(TEST_GRID) == 8108
+print("Part One:", active(GRID))
+
+assert group_all(TEST_GRID) == 1242
+print("Part Two:", group_all(GRID))
