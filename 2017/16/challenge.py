@@ -45,16 +45,20 @@ print("Part One:", parse(INPUT, START))
 
 
 def find_cycle(input, l):
-    INDEXES = {}
+    indexes = {}
     for i in count():
         l = parse(input, l)
-        if l in INDEXES:
-            return l, INDEXES[l], i - INDEXES[l]
-        INDEXES[l] = i
+        if l in indexes:
+            return l, indexes[l], i - indexes[l]
+        indexes[l] = i
 
 
-l, cycle_start, cycle_length = find_cycle(INPUT, START)
-iterations_left = (999999999 - cycle_start) % cycle_length
-for _ in range(iterations_left):
-    l = parse(INPUT, l)
-print("Part Two:", l)
+def iterate(input, start, iterations):
+    l, cycle_start, cycle_length = find_cycle(input, start)
+    iterations_left = (iterations - cycle_start) % cycle_length
+    for _ in range(iterations_left):
+        l = parse(INPUT, l)
+    return l
+
+
+print("Part Two:", iterate(INPUT, START, 999999999))
