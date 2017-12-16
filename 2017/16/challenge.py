@@ -3,7 +3,7 @@ from itertools import count
 
 
 def spin(l, x):
-    return l[-x:] + l[:len(l) - x]
+    return l[-x:] + l[:-x]
 
 
 def exchange(l, a, b):
