@@ -1,4 +1,5 @@
 #!/usr/bin/env pypy3
+from itertools import count
 
 
 def spin(l, x):
@@ -21,8 +22,7 @@ assert exchange('eabcd', 3, 4) == 'eabdc'
 assert partner('eabdc', 'e', 'b') == 'baedc'
 
 
-def parse(input):
-    l = 'abcdefghijklmnop'
+def parse(input, l):
     for command in input.split(','):
         if command[0] == 's':
             l = spin(l, int(command[1:]))
@@ -37,6 +37,24 @@ def parse(input):
     return l
 
 
+START = 'abcdefghijklmnop'
+
 with open('input.txt') as input_file:
     INPUT = input_file.read().strip()
-print("Part One:", parse(INPUT))
+print("Part One:", parse(INPUT, START))
+
+
+def find_cycle(input, l):
+    INDEXES = {}
+    for i in count():
+        l = parse(input, l)
+        if l in INDEXES:
+            return l, INDEXES[l], i - INDEXES[l]
+        INDEXES[l] = i
+
+
+l, cycle_start, cycle_length = find_cycle(INPUT, START)
+iterations_left = (999999999 - cycle_start) % cycle_length
+for _ in range(iterations_left):
+    l = parse(INPUT, l)
+print("Part Two:", l)
