@@ -22,5 +22,20 @@ def repeat_spin(steps, times=2017):
     return l[position + 1]
 
 
+test_spin = repeat_spin(3)
 assert repeat_spin(3) == 638
-print("Part One:", repeat_spin(INPUT))
+part_one = repeat_spin(INPUT)
+print("Part One:", repeat_spin(2017))
+
+
+def spy_on(target, steps, times=50000000):
+    target_value = None
+    position = 0
+    for i in range(1, times + 1):
+        position = ((position + steps) % i) + 1
+        if position == target:
+            target_value = i
+    return target_value
+
+
+print("Part Two:", spy_on(1, INPUT))
