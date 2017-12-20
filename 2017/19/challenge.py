@@ -36,9 +36,10 @@ def path_find(grid):
     x, y = find_start(grid)
     direction_x, direction_y = (0, 1)
     acc = []
+    steps = 0
     while True:
         if grid[y][x] == ' ':
-            return ''.join(acc)
+            return ''.join(acc), steps
 
         if grid[y][x] == '+':
             direction_x, direction_y = change_direction((x, y), (direction_x, direction_y), grid)
@@ -48,6 +49,7 @@ def path_find(grid):
 
         x += direction_x
         y += direction_y
+        steps += 1
 
 
 TEST_GRID = """     |          
@@ -58,9 +60,11 @@ TEST_GRID = """     |
      +B-+  +--+ 
 """
 
-assert path_find(build_grid(TEST_GRID)) == 'ABCDEF'
+assert path_find(build_grid(TEST_GRID)) == ('ABCDEF', 38)
 
 with open('input.txt') as INPUT:
     GRID = build_grid(INPUT.read())
 
-print("Part One:", path_find(GRID))
+part_one, part_two = path_find(GRID)
+print("Part One:", part_one)
+print("Part Two:", part_two)
