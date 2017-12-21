@@ -131,3 +131,4 @@ with open('input.txt') as input_file:
     INPUT = input_file.read().strip()
 
 print("Part One:", part1(INPUT, 5))
+print("Part Two:", part1(INPUT, 18))
