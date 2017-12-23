@@ -1,11 +1,7 @@
 #!/usr/bin/env pypy3
 
-from collections import defaultdict
-
-
 def execute(instructions):
     registers = {r: 0 for r in 'abcdefgh'}
-    sounds = []
 
     def deref(x):
         try:
