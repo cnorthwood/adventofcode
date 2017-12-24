@@ -19,6 +19,10 @@ def strongest(parts):
     return max(map(sum, build_chains([0], parts)))
 
 
+def strongest_longest(parts):
+    return max((len(chain), sum(chain)) for chain in build_chains([0], parts))[1]
+
+
 TEST = list(parse("""0/2
 2/2
 2/3
@@ -33,3 +37,4 @@ assert strongest(TEST) == 31
 with open('input.txt') as input_file:
     INPUT = list(parse(input_file.read()))
 print("Part One:", strongest(INPUT))
+print("Part Two:", strongest_longest(INPUT))
