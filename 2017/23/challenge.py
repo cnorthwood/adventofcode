@@ -1,5 +1,8 @@
 #!/usr/bin/env pypy3
 
+from itertools import product
+
+
 def execute(instructions):
     registers = {r: 0 for r in 'abcdefgh'}
 
@@ -54,3 +57,15 @@ with open('input.txt') as input_file:
     INPUT = input_file.read().strip()
 
 print("Part One:", execute(INPUT))
+
+
+def main():
+    h = 0
+    for b in range(109900, 126901, 17):
+        for d, e in product(range(2, b + 1), range(2, b + 1)):
+            if (d * e) == b:
+                h += 1
+                break
+    return h
+
+print("Part Two:", main())
