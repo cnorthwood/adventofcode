@@ -44,7 +44,7 @@ def build_cloth_claims(claims):
 
 
 def overlapping_squares(squares):
-    return sum([1 for n in squares.values() if n > 1])
+    return sum(1 for n in squares.values() if n > 1)
 
 
 # test_cloth_claims = build_cloth_claims(test_claims)
