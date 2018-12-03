@@ -1,6 +1,8 @@
 #!/usr/bin/env pypy3
 
 from collections import Counter, namedtuple
+from itertools import reduce
+
 import re
 
 TEST = """
@@ -43,7 +45,7 @@ def build_cloth_claims(claims):
 
 
 def overlapping_squares(squares):
-    return len([n for n in squares.values() if n > 1])
+    return reduce([1 for n in squares.values() if n > 1])
 
 
 # test_cloth_claims = build_cloth_claims(test_claims)
