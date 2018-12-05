@@ -32,13 +32,13 @@ with open('input.txt') as input_file:
 print("Part One: {}".format(annihilate(INPUT)))
 
 
-def eliminate_problem(polymer, pair):
-    polymer = re.sub('|'.join(pair), '', polymer)
+def eliminate_problem(polymer, letter):
+    polymer = re.sub(letter, '', polymer, flags=re.I)
     return annihilate(polymer)
 
 
 def part_two(polymer):
-    return min(eliminate_problem(polymer, pair) for pair in pairs)
+    return min(eliminate_problem(polymer, letter) for letter in string.ascii_lowercase)
 
 
 assert(part_two(TEST) == 4)
