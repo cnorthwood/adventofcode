@@ -1,5 +1,6 @@
 #!/usr/bin/env pypy3
 
+from functools import lru_cache
 from itertools import chain
 import re
 import string
@@ -16,6 +17,7 @@ pairs = list(
 PAIRS_RE = re.compile('({})'.format('|'.join(pairs)))
 
 
+@lru_cache(maxsize=None)
 def annihilate(polymer):
     polymer, subs_made = PAIRS_RE.subn('', polymer)
     if subs_made == 0:
