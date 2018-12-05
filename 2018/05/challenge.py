@@ -3,9 +3,6 @@
 from itertools import chain
 import re
 import string
-import sys
-
-sys.setrecursionlimit(10000)
 
 TEST = 'dabAcCaCBAcCcaDA'
 
@@ -20,11 +17,10 @@ PAIRS_RE = re.compile('({})'.format('|'.join(pairs)))
 
 
 def annihilate(polymer):
-    polymer, subs_made = PAIRS_RE.subn('', polymer)
-    if subs_made == 0:
-        return polymer
-    else:
-        return annihilate(polymer)
+    subs_made = 1
+    while subs_made > 0:
+        polymer, subs_made = PAIRS_RE.subn('', polymer)
+    return polymer
 
 
 TEST_POLYMER = annihilate(TEST)
