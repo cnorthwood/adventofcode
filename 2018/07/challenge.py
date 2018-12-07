@@ -49,7 +49,14 @@ def multi_order(deps, num_workers, step_time=lambda s: ord(s) - 4):
                     worker = None
 
             if worker is None:
-                next_steps = sorted(filter(lambda step: len(deps[step]) == 0 and step not in {w[0] for w in workers if w is not None}, deps.keys()))
+                next_steps = sorted(
+                    filter(
+                        lambda step: len(deps[step]) == 0
+                                     and step not in {w[0] for w in workers if w is not None},
+                        deps.keys()
+                    ),
+                    reverse=True
+                )
                 if next_steps:
                     workers[i] = (next_steps[0], t + step_time(next_steps[0]))
                 else:
