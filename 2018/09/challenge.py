@@ -1,5 +1,7 @@
 #!/usr/bin/env pypy3
 
+from collections import deque
+
 
 with open('input.txt') as input_file:
     input_tokens = input_file.read().strip().split()
@@ -8,18 +10,17 @@ with open('input.txt') as input_file:
 
 
 def simulate(num_players, last_marble):
-    current = 0
-    marbles = []
+    marbles = deque()
     scores = {player: 0 for player in range(num_players)}
     for marble in range(last_marble + 1):
         if marble == 0:
-            marbles = [0]
+            marbles.append(0)
         elif marble % 23 == 0:
-            current = (current - 7) % len(marbles)
-            scores[marble % num_players] += marble + marbles.pop(current)
+            marbles.rotate(7)
+            scores[marble % num_players] += marble + marbles.popleft()
         else:
-            current = (current + 2) % len(marbles)
-            marbles.insert(current, marble)
+            marbles.rotate(-2)
+            marbles.appendleft(marble)
     return max(scores.values())
 
 
