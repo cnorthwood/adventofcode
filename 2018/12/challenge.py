@@ -40,10 +40,17 @@ def iterate(gen, rules):
 def part_one(iterations, state, rules):
     for _ in range(iterations):
         state = iterate(state, rules)
+        # print(_, sum(pot_id for pot_id, has_plant in state.items() if has_plant))
         # print_state(state)
     return sum(pot_id for pot_id, has_plant in state.items() if has_plant)
 
 
 assert(part_one(20, TEST_INITIAL, TEST_RULES) == 325)
 print("Part One: {}".format(part_one(20, INITIAL, RULES)))
-print("Part Two: {}".format(part_one(50000000000, INITIAL, RULES)))
+
+PART_TWO_GOAL = 50000000000
+ITERATIONS_TIL_STABLE = 200  # assume this is long enough to become stable...
+base = part_one(ITERATIONS_TIL_STABLE, INITIAL, RULES)
+diff = part_one(ITERATIONS_TIL_STABLE+1, INITIAL, RULES) - base
+
+print("Part Two: {}".format(base + (diff * (PART_TWO_GOAL - ITERATIONS_TIL_STABLE))))
