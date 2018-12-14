@@ -33,14 +33,14 @@ def load_grid(filename):
     with open(filename) as input_file:
         data = input_file.read()
     grid = {}
-    carts = set()
+    carts = {}
     for y, line in enumerate(data.splitlines()):
         for x, c in enumerate(line):
             if c in TRACK_TYPES:
                 grid[x, y] = TRACK_TYPES[c]
             if c in CART_TYPES:
-                carts.add(((x, y), CART_TYPES[c], 0))
-    for pos, cart_type, turns in carts:
+                carts[x, y] = (CART_TYPES[c], 0)
+    for pos in carts.keys():
         grid[pos] = TRACK_STRAIGHT
     return grid, carts
 
@@ -48,7 +48,7 @@ def load_grid(filename):
 def print_grid(grid, carts):
     max_x = max(x for (x, y) in grid.keys())
     max_y = max(y for (x, y) in grid.keys())
-    carts = {pos: direction for pos, direction, turns in carts}
+    carts = {pos: direction for pos, (direction, turns) in carts.items()}
     sys.stdout.write('\n')
     for y in range(max_y + 1):
         for x in range(max_x + 1):
@@ -75,8 +75,9 @@ def print_grid(grid, carts):
     sys.stdout.write('\n')
 
 
-def next_cart(cart, grid):
-    (x, y), direction, turns = cart
+def next_cart(pos, cart, grid):
+    x, y = pos
+    direction, turns = cart
     if direction == CART_LEFT and grid[x, y] == TRACK_STRAIGHT:
         return (x - 1, y), direction, turns
     elif direction == CART_RIGHT and grid[x, y] == TRACK_STRAIGHT:
@@ -138,18 +139,25 @@ def next_cart(cart, grid):
         raise Exception()
 
 
-def step(grid, carts):
-    return {next_cart(cart, grid) for cart in carts}
+def step(grid, carts, stop_on_crash=False):
+    for pos in sorted(carts.keys(), key=lambda pos: (pos[1], pos[0])):
+        if pos in carts:
+            next_pos, direction, turns = next_cart(pos, carts[pos], grid)
+            del carts[pos]
+            if next_pos in carts:
+                del carts[next_pos]
+                if stop_on_crash:
+                    return next_pos
+            else:
+                carts[next_pos] = (direction, turns)
 
 
-def find_crash(grid, carts):
+def part_one(grid, initial_carts):
+    carts = dict(initial_carts)
     for _ in count():
-        # print_grid(grid, carts)
-        for this_cart in carts:
-            other_cart_positions = {pos for (pos, direction, turns) in carts - {this_cart}}
-            if this_cart[0] in other_cart_positions:
-                return this_cart[0], {cart for cart in carts if cart[0] != this_cart[0]}
-        carts = step(grid, carts)
+        crash_loc = step(grid, carts, stop_on_crash=True)
+        if crash_loc is not None:
+            return crash_loc
 
 
 TEST_GRID, TEST_CARTS = load_grid('test.txt')
@@ -157,15 +165,16 @@ TEST_GRID2, TEST_CARTS2 = load_grid('test2.txt')
 INITIAL_GRID, INITIAL_CARTS = load_grid('input.txt')
 
 
-assert(find_crash(TEST_GRID, TEST_CARTS)[0] == (7, 3))
-print("Part One: {},{}".format(*find_crash(INITIAL_GRID, INITIAL_CARTS)[0]))
+assert(part_one(TEST_GRID, TEST_CARTS) == (7, 3))
+print("Part One: {},{}".format(*part_one(INITIAL_GRID, INITIAL_CARTS)))
 
 
-def remove_all_crashes(grid, carts):
+def part_two(grid, initial_carts):
+    carts = dict(initial_carts)
     while len(carts) > 1:
-        carts = find_crash(grid, carts)[1]
-    return carts.pop()[0]
+        step(grid, carts)
+    return list(carts.keys())[0]
 
 
-assert(remove_all_crashes(TEST_GRID2, TEST_CARTS2) == (6,4))
-print("Part Two: {},{}".format(*remove_all_crashes(INITIAL_GRID, INITIAL_CARTS)))
+assert(part_two(TEST_GRID2, TEST_CARTS2) == (6,4))
+print("Part Two: {},{}".format(*part_two(INITIAL_GRID, INITIAL_CARTS)))
