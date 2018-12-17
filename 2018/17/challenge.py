@@ -27,39 +27,63 @@ TEST = set(load_clay('test.txt'))
 BLOCKS = set(load_clay('input.txt'))
 
 
-def visualise(blocks, edges, clay):
-    min_x = min(x for x, y in blocks | set(edges) | clay)
-    min_y = min(y for x, y in blocks | set(edges) | clay)
-    max_x = max(x for x, y in blocks | set(edges) | clay)
-    max_y = max(y for x, y in blocks | set(edges) | clay)
-    sys.stdout.write('\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n')
+def visualise(blocks, edges, clay, stdout=False):
+    min_x = min(x for x, y in blocks | edges | clay)
+    min_y = min(y for x, y in blocks | edges | clay)
+    max_x = max(x for x, y in blocks | edges | clay)
+    max_y = max(y for x, y in blocks | edges | clay)
+    if stdout:
+        output = sys.stdout
+    else:
+        output = open('debug.txt', 'w')
     for y in range(min_y, max_y  + 1):
         for x in range(min_x, max_x  + 1):
             if (x, y) in clay:
-                sys.stdout.write('█')
+                output.write('█')
             elif (x, y) in blocks:
-                sys.stdout.write('W')
+                output.write('W')
             elif (x, y) in edges:
-                sys.stdout.write('~')
+                output.write('~')
             else:
-                sys.stdout.write(' ')
-        sys.stdout.write('\n')
+                output.write(' ')
+        output.write('\n')
+    if not stdout:
+        output.close()
 
 
 def simulate(clay):
     blocks = set()
-    edges = [(500, 0)]
+    edges = {(500, 0)}
     max_y = max(y for x, y in clay)
+    touched_edge = False
     while edges:
-        visualise(blocks, edges, clay)
-        edges = sorted(edges, key=lambda pos: pos[1], reverse=True)
-        x, y = edges[0]
-        if (x, y + 1) not in clay and (x, y + 1) not in blocks:
-            edges.append((x, y + 1))
+        # if len(edges) % 100 == 0:
+        #     visualise(blocks, edges, clay)
+        x, y = max(edges, key=lambda pos: pos[1])
+        if (x, y + 1) not in clay | blocks | edges:
             if y + 1 <= max_y:
-                edges.append((x, y + 1))
+                edges.add((x, y + 1))
+            else:
+                touched_edge = True
+                for up_y in range(y, 0, step=-1):
+                    if (x, up_y) in edges:
+                        blocks.add((x, up_y))
+                        edges.remove((x, up_y))
+                    else:
+                        break
+        elif (touched_edge and (x, y + 1) in clay) or (not touched_edge and (x, y + 1) in clay | blocks):
+            if (x - 1, y) not in clay | blocks | edges:
+                edges.add((x - 1, y))
+            if (x + 1, y) not in clay | blocks | edges:
+                edges.add((x + 1, y))
+            blocks.add((x, y))
+            edges.remove((x, y))
+        elif touched_edge and (x, y + 1) in blocks:
+            blocks.add((x, y))
+            edges.remove((x, y))
 
-    return sum(1 for x, y in (blocks | edges) if y >= min(y for x, y in clay))
+    return sum(1 for x, y in blocks if y >= min(y for x, y in clay))
 
 
 assert(simulate(TEST) == 57)
+print("Part One: {}".format(simulate(BLOCKS)))
