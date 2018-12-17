@@ -27,22 +27,23 @@ TEST = set(load_clay('test.txt'))
 BLOCKS = set(load_clay('input.txt'))
 
 
-def visualise(blocks, edges, clay, stdout=False):
-    min_x = min(x for x, y in blocks | edges | clay)
-    min_y = min(y for x, y in blocks | edges | clay)
-    max_x = max(x for x, y in blocks | edges | clay)
-    max_y = max(y for x, y in blocks | edges | clay)
+def visualise(flowing_water, resting_water, clay, stdout=False):
+    min_x = min(x for x, y in flowing_water | resting_water | clay)
+    min_y = min(y for x, y in flowing_water | resting_water | clay)
+    max_x = max(x for x, y in flowing_water | resting_water | clay)
+    max_y = max(y for x, y in flowing_water | resting_water | clay)
     if stdout:
         output = sys.stdout
+        output.write('\n\n~~~~~~~~~~~~~~~\n\n')
     else:
         output = open('debug.txt', 'w')
     for y in range(min_y, max_y  + 1):
         for x in range(min_x, max_x  + 1):
             if (x, y) in clay:
                 output.write('█')
-            elif (x, y) in blocks:
+            elif (x, y) in resting_water:
                 output.write('W')
-            elif (x, y) in edges:
+            elif (x, y) in flowing_water:
                 output.write('~')
             else:
                 output.write(' ')
@@ -51,39 +52,44 @@ def visualise(blocks, edges, clay, stdout=False):
         output.close()
 
 
+def is_contained(x, y, min_x, max_x, clay, water):
+    for left_x in range(x, min_x - 1, step=-1):
+        if (left_x, y + 1) not in clay and (left_x, y + 1) not in water:
+            return False
+        if (left_x, y) in clay:
+            for right_x in range(x, max_x + 1):
+                if (right_x, y + 1) not in clay and (right_x, y + 1) not in water:
+                    return False
+                if (right_x, y) in clay:
+                    return True
+
+
 def simulate(clay):
-    blocks = set()
-    edges = {(500, 0)}
+    flowing_water = {(500, 0)}
+    resting_water = set()
+    min_x = min(x for x, y in clay)
+    max_x = max(x for x, y in clay)
+    min_y = min(y for x, y in clay)
     max_y = max(y for x, y in clay)
-    touched_edge = False
-    while edges:
-        # if len(edges) % 100 == 0:
-        #     visualise(blocks, edges, clay)
-        x, y = max(edges, key=lambda pos: pos[1])
-        if (x, y + 1) not in clay | blocks | edges:
-            if y + 1 <= max_y:
-                edges.add((x, y + 1))
+    last_size = (0, 0)
+    while last_size != (len(flowing_water), len(resting_water)):
+        last_size = (len(flowing_water), len(resting_water))
+        for x, y in sorted(flowing_water, key=lambda pos: pos[1]):
+            if (x, y + 1) not in clay and (x, y + 1) not in resting_water:
+                if y <= max_y:
+                    flowing_water.add((x, y + 1))
             else:
-                touched_edge = True
-                for up_y in range(y, 0, step=-1):
-                    if (x, up_y) in edges:
-                        blocks.add((x, up_y))
-                        edges.remove((x, up_y))
-                    else:
-                        break
-        elif (touched_edge and (x, y + 1) in clay) or (not touched_edge and (x, y + 1) in clay | blocks):
-            if (x - 1, y) not in clay | blocks | edges:
-                edges.add((x - 1, y))
-            if (x + 1, y) not in clay | blocks | edges:
-                edges.add((x + 1, y))
-            blocks.add((x, y))
-            edges.remove((x, y))
-        elif touched_edge and (x, y + 1) in blocks:
-            blocks.add((x, y))
-            edges.remove((x, y))
-
-    return sum(1 for x, y in blocks if y >= min(y for x, y in clay))
+                if is_contained(x, y, min_x, max_x, clay, resting_water):
+                    flowing_water.remove((x, y))
+                    resting_water.add((x, y))
+                if (x - 1, y) not in clay and (x - 1, y) not in resting_water:
+                    flowing_water.add((x - 1, y))
+                if (x + 1, y) not in clay and (x + 1, y) not in resting_water:
+                    flowing_water.add((x + 1, y))
+    return len(list(filter(lambda pos: min_y <= pos[1] <= max_y, flowing_water | resting_water))), len(resting_water)
 
 
-assert(simulate(TEST) == 57)
-print("Part One: {}".format(simulate(BLOCKS)))
+# assert(simulate(TEST) == (57, 29))
+part_one, part_two = simulate(BLOCKS)
+print("Part One: {}".format(part_one))
+print("Part Two: {}".format(part_two))
