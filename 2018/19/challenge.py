@@ -99,18 +99,23 @@ def load_prog(filename):
     return ip, prog
 
 
-def execute(ipr, instructions):
-    r = [0] * 6
-    ip = 0
-    while 0 <= ip < len(instructions):
-        r[ipr] = ip
-        op, args = instructions[ip]
+def execute(ipr, instructions, initial_r0=0):
+    r = [initial_r0] + [0] * 5
+    while 0 <= r[ipr] < len(instructions):
+        # optimiser hack, stolen from Reddit
+        if r[ipr] == 1:
+            range_reg = max(enumerate(r), key=lambda reg: reg[1])[0]
+            r[0] = sum(i for i in range(1, r[range_reg] + 1) if r[range_reg] % i == 0)
+            break
+        op, args = instructions[r[ipr]]
         op(r, *args)
-        ip = r[ipr] + 1
+        r[ipr] += 1
+    r[ipr] -= 1
     return r
 
 
-TEST_IP, TEST_PROG = load_prog('test.txt')
+# TEST_IP, TEST_PROG = load_prog('test.txt')
 IP, PROG = load_prog('input.txt')
-assert(execute(TEST_IP, TEST_PROG) == [6, 5, 6, 0, 0, 9])
+# assert(execute(TEST_IP, TEST_PROG) == [6, 5, 6, 0, 0, 9])
 print("Part One: {}".format(execute(IP, PROG)[0]))
+print("Part Two: {}".format(execute(IP, PROG, 1)[0]))
