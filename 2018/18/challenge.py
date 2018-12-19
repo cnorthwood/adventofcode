@@ -63,11 +63,11 @@ def part_one(grid):
     return sum(1 for c in grid.values() if c == TREES) * sum(1 for c in grid.values() if c == LUMBERYARD)
 
 
-TEST = load_grid('test.txt')
+# TEST = load_grid('test.txt')
 INPUT = load_grid('input.txt')
 
 
-assert(part_one(TEST) == 1147)
+# assert(part_one(TEST) == 1147)
 print("Part One: {}".format(part_one(INPUT)))
 
 
