@@ -37,8 +37,8 @@ def visualise(flowing_water, resting_water, clay, stdout=False):
         output.write('\n\n~~~~~~~~~~~~~~~\n\n')
     else:
         output = open('debug.txt', 'w')
-    for y in range(min_y, max_y  + 1):
-        for x in range(min_x, max_x  + 1):
+    for y in range(min_y, max_y + 1):
+        for x in range(min_x, max_x + 1):
             if (x, y) in clay:
                 output.write('█')
             elif (x, y) in resting_water:
