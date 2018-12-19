@@ -72,7 +72,7 @@ print("Part One: {}".format(part_one(INPUT)))
 
 
 def part_two(grid, iterations=1000000000):
-    first_grids = list(run(grid, 500))
+    first_grids = list(run(grid, 600))
     reprs = [''.join(g[p] for p in sorted(g)) for g in first_grids]
     for i, g in enumerate(reprs):
         try:
