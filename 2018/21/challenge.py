@@ -119,19 +119,30 @@ def execute(ipr, instructions, initial_r0=0):
 IP, PROG = load_prog('input.txt')
 
 
-def part_one(ipr, instructions):
+def watch_r0_comparison(ipr, instructions):
     r = [0] * 6
-    while 0 <= r[ipr] < len(instructions):
+    max_ip = len(instructions)
+    while r[ipr] < max_ip:
         op, args = instructions[r[ipr]]
-        # break when r0 is looked at
-        if op in {gtri, eqri, gtrr, eqrr} and args[0] == 0:
-            return r[args[1]]
-        if op in {gtir, eqir, gtrr, eqrr} and args[1] == 0:
-            return r[args[0]]
+        # peek when r0 is looked at
+        if op == eqrr and args[1] == 0:
+            yield r[args[0]]
         op(r, *args)
         r[ipr] += 1
     r[ipr] -= 1
     return r
 
 
-print("Part One: {}".format(part_one(IP, PROG)))
+MIN_R0 = next(watch_r0_comparison(IP, PROG))
+print("Part One: {}".format(MIN_R0))
+
+
+def part_two(ipr, instuctions):
+    seen = []
+    for r0_compared in watch_r0_comparison(ipr, instuctions):
+        if r0_compared in seen:
+            return seen[-1]
+        seen.append(r0_compared)
+
+
+print("Part Two: {}".format(part_two(IP, PROG)))
