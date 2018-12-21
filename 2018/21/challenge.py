@@ -138,11 +138,13 @@ print("Part One: {}".format(MIN_R0))
 
 
 def part_two(ipr, instuctions):
-    seen = []
+    seen = set()
+    last = None
     for r0_compared in watch_r0_comparison(ipr, instuctions):
         if r0_compared in seen:
-            return seen[-1]
-        seen.append(r0_compared)
+            return last
+        last = r0_compared
+        seen.add(r0_compared)
 
 
 print("Part Two: {}".format(part_two(IP, PROG)))
