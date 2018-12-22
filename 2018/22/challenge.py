@@ -94,14 +94,14 @@ def find_path(cave):
     return found
 
 
-TEST = Cave(510, (10, 10))
-assert(TEST.type(0, 0) == Cave.ROCKY)
-assert(TEST.type(1, 0) == Cave.WET)
-assert(TEST.type(0, 1) == Cave.ROCKY)
-assert(TEST.type(1, 1) == Cave.NARROW)
-assert(TEST.type(10, 10) == Cave.ROCKY)
-assert(TEST.part_one() == 114)
-assert(find_path(TEST) == 45)
+# TEST = Cave(510, (10, 10))
+# assert(TEST.type(0, 0) == Cave.ROCKY)
+# assert(TEST.type(1, 0) == Cave.WET)
+# assert(TEST.type(0, 1) == Cave.ROCKY)
+# assert(TEST.type(1, 1) == Cave.NARROW)
+# assert(TEST.type(10, 10) == Cave.ROCKY)
+# assert(TEST.part_one() == 114)
+# assert(find_path(TEST) == 45)
 
 CAVE = Cave(*load_input('input.txt'))
 print("Part One: {}".format(CAVE.part_one()))
