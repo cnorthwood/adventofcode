@@ -65,7 +65,6 @@ def find_optimal_space(nanobots):
     area = (min(n.x for n in nanobots), min(n.y for n in nanobots), min(n.z for n in nanobots), max(n.x for n in nanobots), max(n.y for n in nanobots), max(n.z for n in nanobots))
     while factor > 1:
         factor //= 2
-        print(factor, area)
         area = compress_nanobots(nanobots, factor, *area)
     return get_distance(Nanobot(0, 0, 0, 0), Nanobot(area[0], area[1], area[2], 0))
 
