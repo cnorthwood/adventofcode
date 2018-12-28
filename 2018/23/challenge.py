@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 import re
+from z3 import If, Int, Optimize
 
 INPUT_RE = re.compile(r'pos=<(?P<x>-?\d+),(?P<y>-?\d+),(?P<z>-?\d+)>, r=(?P<r>\d+)')
 Nanobot = namedtuple('Nanobot', 'x y z r')
@@ -45,28 +46,26 @@ assert(get_num_in_range(find_largest_nanobot(TEST), TEST) == 7)
 print("Part One: {}".format(get_num_in_range(find_largest_nanobot(INPUT), INPUT)))
 
 
-def compress_nanobots(nanobots, factor, min_x, min_y, min_z, max_x, max_y, max_z):
-    nanobots = [Nanobot(n.x // factor, n.y // factor, n.z // factor, n.r // factor) for n in nanobots]
-    density = {
-        (x, y, z): in_range_of(Nanobot(x, y, z, 0), nanobots)
-            for x in range(min_x // factor, max_x // factor + 1)
-            for y in range(min_y // factor, max_y // factor + 1)
-            for z in range(min_z // factor, max_z // factor + 1)
-    }
-    densest_area = max(density.values())
-    return min(
-        [(x * factor, y * factor, z * factor, (x + 1) * factor, (y + 1) * factor, (z + 1) * factor) for (x, y, z) in density if density[(x, y, z)] == densest_area],
-        key=lambda a: get_distance(Nanobot(0, 0, 0, 0), Nanobot(a[0], a[1], a[2], 0))
-    )
+def zabs(x):
+    return If(x >= 0, x, -x)
 
 
 def find_optimal_space(nanobots):
-    factor = 2**27
-    area = (min(n.x for n in nanobots), min(n.y for n in nanobots), min(n.z for n in nanobots), max(n.x for n in nanobots), max(n.y for n in nanobots), max(n.z for n in nanobots))
-    while factor > 1:
-        factor //= 2
-        area = compress_nanobots(nanobots, factor, *area)
-    return get_distance(Nanobot(0, 0, 0, 0), Nanobot(area[0], area[1], area[2], 0))
+    (x, y, z) = (Int('x'), Int('y'), Int('z'))
+    in_ranges = [
+        Int('in_range_{}'.format(i)) for i in range(len(nanobots))
+    ]
+    range_count = Int('sum')
+    optimiser = Optimize()
+    for i, nanobot in enumerate(nanobots):
+        optimiser.add(in_ranges[i] == If(zabs(x - nanobot.x) + zabs(y - nanobot.y) + zabs(z - nanobot.z) <= nanobot.r, 1, 0))
+    optimiser.add(range_count == sum(in_ranges))
+    dist_from_zero = Int('dist')
+    optimiser.add(dist_from_zero == zabs(x) + zabs(y) + zabs(z))
+    optimiser.maximize(range_count)
+    result = optimiser.minimize(dist_from_zero)
+    optimiser.check()
+    return optimiser.lower(result)
 
 
 assert(find_optimal_space(TEST2) == 36)
