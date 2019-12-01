@@ -1,4 +1,4 @@
-#!/usr/bin/env pypy3
+#!/usr/bin/env python3
 
 
 def fuel_for_mass(mass):
@@ -12,14 +12,14 @@ def total_fuel_requirement(initial_mass):
     return sum(masses[1:])
 
 
-assert(fuel_for_mass(12) == 2)
-assert(fuel_for_mass(14) == 2)
-assert(fuel_for_mass(1969) == 654)
-assert(fuel_for_mass(100756) == 33583)
-
-assert(total_fuel_requirement(14) == 2)
-assert(total_fuel_requirement(1969) == 966)
-assert(total_fuel_requirement(100756) == 50346)
+# assert(fuel_for_mass(12) == 2)
+# assert(fuel_for_mass(14) == 2)
+# assert(fuel_for_mass(1969) == 654)
+# assert(fuel_for_mass(100756) == 33583)
+#
+# assert(total_fuel_requirement(14) == 2)
+# assert(total_fuel_requirement(1969) == 966)
+# assert(total_fuel_requirement(100756) == 50346)
 
 with open("input.txt") as puzzle_input:
     masses = [int(line) for line in puzzle_input]
