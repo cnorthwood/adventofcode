@@ -6,7 +6,7 @@ YEAR="${1}"
 DAY="${2}"
 
 cd /code/${YEAR}/`printf %02d $DAY`/
-python3 -m compileall
+python3 -m compileall >/dev/null
 
 if [ -f "part2.py" ] ; then
     time sh -c './part1.py; ./part2.py'
