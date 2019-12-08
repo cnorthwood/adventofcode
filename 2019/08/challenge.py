@@ -35,7 +35,7 @@ def print_image(image):
 
 
 with open("input.txt") as input_file:
-    INPUT = input_file.read()
+    INPUT = input_file.read().strip()
 
 layers = [INPUT[i:i + (WIDTH*HEIGHT)] for i in range(0, len(INPUT), WIDTH * HEIGHT)]
 fewest_zero_layer = min(layers, key=lambda layer: num_digits(layer, "0"))
