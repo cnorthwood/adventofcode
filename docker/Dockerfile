@@ -5,6 +5,4 @@ RUN dnf install -y python3 python3-pip pypy3 && pypy3 -mensurepip && pypy3 -mpip
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-USER nobody
-
 CMD /entrypoint.sh
