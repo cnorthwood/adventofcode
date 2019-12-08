@@ -12,9 +12,9 @@ if [ -f "part2.py" ] ; then
 elif [ -f "challenge2.py" ] ; then
     time sh -c './challenge.py; ./challenge2.py'
 elif [ -f "challenge.py" ] ; then
-    time sh -c './challenge.py'
+    sh -c 'time ./challenge.py'
 elif [ -f "code.py" ] ; then
-    time sh -c './code.py'
+    sh -c 'time ./code.py'
 else
     echo "not sure how to run this"
     exit 1
