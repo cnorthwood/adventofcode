@@ -1,4 +1,4 @@
-#!/usr/bin/env pypy3
+#!/usr/bin/env python3
 # coding=utf8
 
 import sys
@@ -37,7 +37,7 @@ def print_image(image):
 with open("input.txt") as input_file:
     INPUT = input_file.read()
 
-layers = [INPUT[i:i + (WIDTH*HEIGHT)] for i in range(len(INPUT), step=WIDTH * HEIGHT)]
+layers = [INPUT[i:i + (WIDTH*HEIGHT)] for i in range(0, len(INPUT), WIDTH * HEIGHT)]
 fewest_zero_layer = min(layers, key=lambda layer: num_digits(layer, "0"))
 
 print(f"Part One: {num_digits(fewest_zero_layer, '1') * num_digits(fewest_zero_layer, '2')}")
