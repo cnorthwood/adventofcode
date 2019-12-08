@@ -1,12 +1,13 @@
 #!/usr/bin/env pypy3
+# coding=utf8
 
 import sys
 
 WIDTH = 25
 HEIGHT = 6
 CHARS = {
-    "0": "█",
-    "1": " ",
+    "0": " ",
+    "1": "█",
 }
 
 
@@ -19,7 +20,7 @@ def decode_image(layers):
     for layer in layers:
         for y in range(HEIGHT):
             for x in range(WIDTH):
-                pixel = layer[y * HEIGHT + x]
+                pixel = layer[y * WIDTH + x]
                 if (x, y) not in decoded and pixel != "2":
                     decoded[x, y] = pixel
     return decoded
@@ -36,7 +37,7 @@ def print_image(image):
 with open("input.txt") as input_file:
     INPUT = input_file.read()
 
-layers = [INPUT[i:i + (WIDTH*HEIGHT)] for i in range(0, len(INPUT), step=WIDTH * HEIGHT)]
+layers = [INPUT[i:i + (WIDTH*HEIGHT)] for i in range(len(INPUT), step=WIDTH * HEIGHT)]
 fewest_zero_layer = min(layers, key=lambda layer: num_digits(layer, "0"))
 
 print(f"Part One: {num_digits(fewest_zero_layer, '1') * num_digits(fewest_zero_layer, '2')}")
