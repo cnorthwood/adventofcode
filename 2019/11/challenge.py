@@ -180,7 +180,6 @@ def world_sim(world, inputs, outputs):
             x += 1
 
 
-
 def main(program, start_panel=BLACK):
     world = {(0,0): start_panel}
     inputs = Queue()
@@ -195,21 +194,22 @@ def main(program, start_panel=BLACK):
     return world
 
 
+def print_message(world):
+    points = {point for point, colour in world.items() if colour == WHITE}
+    min_x = min(point[0] for point in points) - 1
+    min_y = min(point[1] for point in points) - 1
+    max_x = max(point[0] for point in points) + 1
+    max_y = max(point[1] for point in points) + 1
+    for y in range(min_y, max_y):
+        for x in range(min_x, max_x):
+            sys.stdout.write("█" if (x, y) in points else " ")
+        sys.stdout.write("\n")
+    sys.stdout.write("\n")
+
+
 with open("input.txt") as input_file:
     INPUT = [int(instruction) for instruction in input_file.read().split(",")]
 
 print(f"Part One: {len(main(INPUT).keys())}")
-world = main(INPUT, start_panel=WHITE)
-points = {point for point, colour in world.items() if colour == WHITE}
-min_x = min(point[0] for point in points) - 1
-min_y = min(point[1] for point in points) - 1
-max_x = max(point[0] for point in points) + 1
-max_y = max(point[1] for point in points) + 1
-
 print("Part Two:")
-for y in range(min_y, max_y):
-    for x in range(min_x, max_x):
-        sys.stdout.write("█" if (x, y) in points else " ")
-    sys.stdout.write("\n")
-sys.stdout.write("\n")
-
+print_message(main(INPUT, start_panel=WHITE))
