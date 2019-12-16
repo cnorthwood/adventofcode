@@ -199,7 +199,7 @@ def search(program):
                 repair_map[next_pos] = output
                 if output == FOUND_OXYGEN and not o2_found:
                     o2_found = steps + 1
-                elif output == MOVED:
+                if output != HIT_WALL:
                     bfs_q.append((next_vm, next_pos, steps + 1))
     return o2_found, repair_map
 
