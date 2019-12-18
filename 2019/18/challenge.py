@@ -9,18 +9,18 @@ from string import ascii_lowercase, ascii_uppercase
 
 def parse_map(input):
     cave = defaultdict(lambda: "#")
-    for y, line in enumerate(input.splitlines(keepends=False)):
+    for y, line in enumerate(input):
         for x, c in enumerate(line):
             cave[x, y] = c
     keys = {}
     doors = {}
     moves = {}
-    start = None
+    start = []
     for (x, y), c in cave.items():
         if c == "#":
             continue
         elif c == "@":
-            start = x, y
+            start.append((x, y))
         elif c in ascii_lowercase:
             keys[x, y] = c
         elif c in ascii_uppercase:
@@ -59,7 +59,7 @@ def find_path(moves, doors, a, b):
 
 def paths(start, moves, keys, doors):
     distances = defaultdict(dict)
-    for a, b in permutations([start] + list(keys.keys()), r=2):
+    for a, b in permutations(start + list(keys.keys()), r=2):
         if b in distances[a]:
             continue
         distances[a][b] = distances[b][a] = find_path(moves, doors, a, b)
@@ -71,24 +71,60 @@ def find_shortest(start, paths, keys):
     min_steps_for_keys = {}
     heapify(queue)
     while queue:
-        steps, pos, keys_obtained = heappop(queue)
+        steps, poss, keys_obtained = heappop(queue)
         if len(keys_obtained) == len(keys):
             return steps
-        for next_pos, (keys_needed, next_steps) in paths[pos].items():
-            if next_pos not in keys or keys[next_pos] in keys_obtained or not all(key_needed in keys_obtained for key_needed in keys_needed):
-                continue
-            next_keys_obtained = frozenset(keys_obtained | {keys[next_pos]})
-            if steps + next_steps < min_steps_for_keys.get((next_pos, next_keys_obtained), inf):
-                min_steps_for_keys[(next_pos, next_keys_obtained)] = steps + next_steps
-                heappush(queue, (
-                    steps + next_steps,
-                    next_pos,
-                    frozenset(keys_obtained | {keys[next_pos]}),
-                ))
+        for i, pos in enumerate(poss):
+            for next_pos, path in paths.get(pos).items():
+                if path is None:
+                    continue
+                keys_needed, next_steps = path
+                if next_pos not in keys or keys[next_pos] in keys_obtained or not all(key_needed in keys_obtained for key_needed in keys_needed):
+                    continue
+                next_keys_obtained = frozenset(keys_obtained | {keys[next_pos]})
+                if steps + next_steps < min_steps_for_keys.get((next_pos, next_keys_obtained), inf):
+                    min_steps_for_keys[(next_pos, next_keys_obtained)] = steps + next_steps
+                    heappush(queue, (
+                        steps + next_steps,
+                        poss[:i] + [next_pos] + poss[i+1:],
+                        frozenset(keys_obtained | {keys[next_pos]}),
+                    ))
+
+
+def patch_input(centre_pos, lines):
+    def patch_line(y, line):
+        for x, c in enumerate(line):
+            if (x, y) in {
+                (centre_pos[0] - 1, centre_pos[1] - 1),
+                (centre_pos[0] - 1, centre_pos[1] + 1),
+                (centre_pos[0] + 1, centre_pos[1] - 1),
+                (centre_pos[0] + 1, centre_pos[1] + 1),
+            }:
+                yield "@"
+            elif (x, y) in {
+                (centre_pos[0] - 1, centre_pos[1]),
+                (centre_pos[0], centre_pos[1] - 1),
+                (centre_pos[0], centre_pos[1]),
+                (centre_pos[0] + 1, centre_pos[1]),
+                (centre_pos[0], centre_pos[1] + 1),
+            }:
+                yield "#"
+            else:
+                yield c
+
+    for y, line in enumerate(lines):
+            yield list(patch_line(y, line))
 
 
 with open("input.txt") as input_file:
-    START, MOVES, KEYS, DOORS = parse_map(input_file.read())
+    START, MOVES, KEYS, DOORS = parse_map(input_file.read().splitlines(keepends=False))
 PATHS = paths(START, MOVES, KEYS, DOORS)
 
 print(f"Part One: {find_shortest(START, PATHS, KEYS)}")
+
+
+with open("input.txt") as input_file:
+    START, MOVES, KEYS, DOORS = parse_map(patch_input(START[0], input_file.read().splitlines(keepends=False)))
+PATHS = paths(START, MOVES, KEYS, DOORS)
+
+print(f"Part Two: {find_shortest(START, PATHS, KEYS)}")
