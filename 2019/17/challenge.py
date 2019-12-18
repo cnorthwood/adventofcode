@@ -171,8 +171,141 @@ def find_intersections(map):
                 yield x * y
 
 
+def find_start(map):
+    return next(pos for pos, c in map.items() if c in "<>^v")
+
+
+def find_path(map):
+    x, y = find_start(map)
+    direction = {"v": "D", "^": "U", "<": "L", ">": "R"}[map[x, y]]
+    num_scaffold = sum(1 for c in map.values() if c == "#")
+    visited = set()
+    while len(visited) < num_scaffold:
+        if direction == "D":
+            next_pos = (x, y + 1)
+        elif direction == "U":
+            next_pos = (x, y - 1)
+        elif direction == "L":
+            next_pos = (x - 1, y)
+        elif direction == "R":
+            next_pos = (x + 1, y)
+        if map.get(next_pos, ".") == "#":
+            yield "1"
+            x, y = next_pos
+            visited.add(next_pos)
+        else:
+            if direction == "D" and map.get((x + 1, y), ".") == "#":
+                yield "L"
+                direction = "R"
+            elif direction == "D" and map.get((x - 1, y), ".") == "#":
+                yield "R"
+                direction = "L"
+            elif direction == "U" and map.get((x - 1, y), ".") == "#":
+                yield "L"
+                direction = "L"
+            elif direction == "U" and map.get((x + 1, y), ".") == "#":
+                yield "R"
+                direction = "R"
+            elif direction == "L" and map.get((x, y + 1), ".") == "#":
+                yield "L"
+                direction = "D"
+            elif direction == "L" and map.get((x, y - 1), ".") == "#":
+                yield "R"
+                direction = "U"
+            elif direction == "R" and map.get((x, y + 1), ".") == "#":
+                yield "R"
+                direction = "D"
+            elif direction == "R" and map.get((x, y - 1), ".") == "#":
+                yield "L"
+                direction = "U"
+            else:
+                raise Exception()
+
+
+# https://www.geeksforgeeks.org/longest-repeating-and-non-overlapping-substring/
+def longest_substring(str):
+    n = len(str)
+    LCSRe = [[0 for x in range(n + 1)]
+             for y in range(n + 1)]
+
+    res = "" # To store result
+    res_length = 0 # To store length of result
+
+    # building table in bottom-up manner
+    index = 0
+    for i in range(1, n + 1):
+        for j in range(i + 1, n + 1):
+
+            # (j-i) > LCSRe[i-1][j-1] to remove
+            # overlapping
+            if (str[i - 1] == str[j - 1] and
+                    LCSRe[i - 1][j - 1] < (j - i)):
+                LCSRe[i][j] = LCSRe[i - 1][j - 1] + 1
+
+                # updating maximum length of the
+                # substring and updating the finishing
+                # index of the suffix
+                if (LCSRe[i][j] > res_length and LCSRe[i][j] <= 18):
+                    res_length = LCSRe[i][j]
+                    index = max(i, index)
+
+            else:
+                LCSRe[i][j] = 0
+
+    # If we have non-empty result, then insert
+    # all characters from first character to
+    # last character of string
+    if (res_length > 0):
+        for i in range(index - res_length + 1,
+                       index + 1):
+            res = res + str[i - 1]
+
+    return res
+
+
+def build_instructions(path):
+    steps = 0
+    for instruction in path:
+        if instruction == "1":
+            steps += 1
+        else:
+            if steps:
+                yield str(steps)
+                steps = 0
+            yield instruction
+    if steps:
+        yield str(steps)
+
+
+def build_route(map):
+    full_path = ",".join(build_instructions("".join(find_path(map))))
+    a = longest_substring(full_path).strip(",")
+    full_path = full_path.replace(a, "A")
+    remaining_parts = [part.strip(",") for part in full_path.split("A") if part]
+    for i, part in enumerate(remaining_parts):
+        other_parts = remaining_parts[:i] + remaining_parts[i+1:]
+        if any(part in other_part for other_part in other_parts):
+            b = part
+            break
+    else:
+        raise Exception("Couldn't figure out a b")
+    full_path = full_path.replace(b, "B")
+    c = longest_substring(full_path).strip("ABC,")
+    full_path = full_path.replace(c, "C")
+    return "\n".join([full_path, a, b, c])
+
+
+def run_robot(program, route):
+    input = list(reversed([ord(c) for c in route + "\nn\n"]))
+    output = []
+    program[0] = 2
+    IntcodeVM(program, input.pop, output.append).run()
+    return output.pop()
+
+
 with open("input.txt") as input_file:
     INPUT = [int(instruction) for instruction in input_file.read().split(",")]
 
 MAP = build_map(INPUT)
 print(f"Part One: {sum(find_intersections(MAP))}")
+print(f"Part Two: {run_robot(INPUT, build_route(MAP))}")
