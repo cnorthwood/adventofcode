@@ -1,6 +1,7 @@
 #!/usr/bin/env pypy3
 
 from collections import defaultdict, namedtuple
+import sys
 
 
 class Halt(Exception):
@@ -300,7 +301,10 @@ def run_robot(program, route):
     output = []
     program[0] = 2
     IntcodeVM(program, input.pop, output.append).run()
-    return output.pop()
+    if output[-1] > 255:
+        return output.pop()
+    for c in output:
+        sys.stdout.write(chr(c))
 
 
 with open("input.txt") as input_file:
