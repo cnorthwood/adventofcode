@@ -12,11 +12,11 @@ def run_springscript(script, mode):
     input = deque(ord(c) for c in script + f"\n{mode}\n")
     output = deque()
     IntcodeVM(SPRINGSCRIPT_VM_CODE, input.popleft, output.append).run()
-    while output:
-        c = output.popleft()
-        if c > 255:
-            return c
+    if output[-1] > 255:
+        return output.pop()
+    for c in output:
         sys.stdout.write(chr(c))
+
 
 PART_ONE_SPRINGSCRIPT = """
 NOT A T
