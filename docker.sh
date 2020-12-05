@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE=cnorthwood/adventofcode:2020.1
+IMAGE=cnorthwood/adventofcode:2020.2
 
 docker image inspect $IMAGE >/dev/null 2>&1
 if [ $? -ne 0 ]

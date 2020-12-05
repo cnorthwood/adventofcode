@@ -16,6 +16,8 @@ elif [ -f "challenge.py" ] ; then
     sh -c 'time ./challenge.py'
 elif [ -f "code.py" ] ; then
     sh -c 'time ./code.py'
+elif [ -f "challenge.js" ] ; then
+    sh -c 'time ./challenge.js'
 else
     echo "not sure how to run this"
     exit 1
