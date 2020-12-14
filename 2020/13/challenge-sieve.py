@@ -23,7 +23,7 @@ def test_sequential_timestamp(timestamp, buses, skip):
     for i, bus_id in enumerate(buses):
         if bus_id is None:
             continue
-        if wait_time(timestamp, bus_id) != i:
+        if (timestamp + i) % bus_id != 0:
             return False, skip
         else:
             skip = prod(bus for bus in buses[:i+1] if bus is not None)
