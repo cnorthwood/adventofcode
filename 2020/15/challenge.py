@@ -1,7 +1,5 @@
 #!/usr/bin/env pypy3
 
-from collections import defaultdict
-
 with open("input.txt") as input_file:
     INPUT = [int(n) for n in input_file.read().split(",")]
 
@@ -14,12 +12,11 @@ def calculate_next_number(last_number, seen_indexes):
 
 
 def find_number(starting_numbers, target):
-    seen_indexes = defaultdict(list)
-    seen_indexes.update({n: [i] for i, n in enumerate(starting_numbers)})
+    seen_indexes = {n: [i] for i, n in enumerate(starting_numbers)}
     last_number = starting_numbers[-1]
     for i in range(len(starting_numbers), target):
         next_number = calculate_next_number(last_number, seen_indexes)
-        seen_indexes[next_number].append(i)
+        seen_indexes[next_number] = [seen_indexes[next_number][-1], i] if next_number in seen_indexes else [i]
         last_number = next_number
     return last_number
 
