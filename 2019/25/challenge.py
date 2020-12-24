@@ -100,6 +100,7 @@ class OutputParser:
 
 
 def can_pick_up(vm, item):
+    # This is annoyingly special-cased
     if item == "giant electromagnet":
         return False
     output_parser = OutputParser()
