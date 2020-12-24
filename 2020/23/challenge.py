@@ -41,7 +41,5 @@ part_two_cups = convert_to_pointers(INPUT + list(range(max(INPUT) + 1, 1000001))
 assert len(part_two_cups) == 1000000
 current_cup = INPUT[0]
 for _ in range(10000000):
-    if _ % 100000 == 0:
-        print(_)
     current_cup = step(current_cup, part_two_cups)
 print(f"Part Two: {part_two_cups[1] * part_two_cups[part_two_cups[1]]}")
