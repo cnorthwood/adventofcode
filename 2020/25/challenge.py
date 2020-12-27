@@ -1,12 +1,6 @@
 #!/usr/bin/env pypy3
+
 from itertools import count
-
-
-def loop_op(subject, loop_size):
-    v = 1
-    for _ in range(loop_size):
-        v = (v * subject) % 20201227
-    return v
 
 
 def find_loop_size(pub_key1, pub_key2):
