@@ -25,39 +25,40 @@ def parse_tiles(input_file):
 
 
 def edges(tile):
-    top = set()
-    bottom = set()
-    left = set()
-    right = set()
-    topr = set()
-    bottomr = set()
-    leftr = set()
-    rightr = set()
+    top = 0
+    bottom = 0
+    left = 0
+    right = 0
+    topr = 0
+    bottomr = 0
+    leftr = 0
+    rightr = 0
     for xy in range(SQUARE_SIZE):
         if (xy, 0) in tile:
-            top.add(xy)
-            topr.add(SQUARE_SIZE - 1 - xy)
+            top |= 1 << xy
+            topr |= 1 << SQUARE_SIZE - 1 - xy
         if (xy, SQUARE_SIZE - 1) in tile:
-            bottom.add(xy)
-            bottomr.add(SQUARE_SIZE - 1 - xy)
+            bottom |= 1 << xy
+            bottomr |= 1 << SQUARE_SIZE - 1 - xy
         if (0, xy) in tile:
-            left.add(xy)
-            leftr.add(SQUARE_SIZE - 1 - xy)
+            left |= 1 << xy
+            leftr |= 1 << SQUARE_SIZE - 1 - xy
         if (SQUARE_SIZE - 1, xy) in tile:
-            right.add(xy)
-            rightr.add(SQUARE_SIZE - 1 - xy)
+            right |= 1 << xy
+            rightr |= 1 << SQUARE_SIZE - 1 - xy
     return frozenset((
-        frozenset(top), frozenset(bottom), frozenset(left), frozenset(right),
-        frozenset(topr), frozenset(bottomr), frozenset(leftr), frozenset(rightr),
+        top, bottom, left, right,
+        topr, bottomr, leftr, rightr,
     ))
 
 
 def neighbours(tile_id, all_edges):
-    return {other_id for other_id, other_edges in all_edges.items() if tile_id != other_id and len(all_edges[tile_id] & other_edges) > 0}
+    return {other_id for other_id, other_edges in all_edges.items()
+            if tile_id != other_id and len(all_edges[tile_id] & other_edges) > 0}
 
 
 with open("input.txt") as input_file:
     TILES = parse_tiles(input_file)
 EDGES = {tile_id: edges(tile) for tile_id, tile in TILES.items()}
-NEIGHBOURS = {tile_id: neighbours(tile_id, EDGES) for tile_id in TILES.keys()}
-print(f"Part One: {prod(tile_id for tile_id, neighbours in NEIGHBOURS.items() if len(neighbours) == 2)}")
+
+print(f"Part One: {prod(tile_id for tile_id in TILES.keys() if len(neighbours(tile_id, EDGES)) == 2)}")
