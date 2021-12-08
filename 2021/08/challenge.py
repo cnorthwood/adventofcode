@@ -30,43 +30,18 @@ INPUT = list(load_input("input.txt"))
 def work_out_mapping(wirings):
     combinations = {wire: set(POSSIBLE_POSITIONS) for wire in POSSIBLE_POSITIONS}
     remaining_wirings = set(wirings)
-    while any(len(possibility) > 1 for possibility in combinations.values()):
-        for possibility in frozenset(remaining_wirings):
-            if len(possibility) == 2:
-                # this is 1
-                combinations["c"] &= possibility
-                combinations["f"] &= possibility
-            elif len(possibility) == 4:
-                # this is 4
-                combinations["b"] &= possibility
-                combinations["c"] &= possibility
-                combinations["d"] &= possibility
-                combinations["f"] &= possibility
-            elif len(possibility) == 3:
-                # this is 7
-                combinations["a"] &= possibility
-                combinations["c"] &= possibility
-                combinations["f"] &= possibility
-            elif len(possibility) == 7:
-                # this is 8
-                combinations["a"] &= possibility
-                combinations["b"] &= possibility
-                combinations["c"] &= possibility
-                combinations["d"] &= possibility
-                combinations["e"] &= possibility
-                combinations["f"] &= possibility
-                combinations["g"] &= possibility
-            elif len(possibility) == 6:
-                # this could be 0, 6 or 9
-                combinations["a"] &= possibility
-                combinations["b"] &= possibility
-                combinations["f"] &= possibility
-                combinations["g"] &= possibility
-            elif len(possibility) == 5:
-                # this could be 2, 3 or 5
-                combinations["a"] &= possibility
-                combinations["d"] &= possibility
-                combinations["g"] &= possibility
+    while any(len(possibilities) > 1 for possibilities in combinations.values()):
+        # where the lengths match figure out the common overlaps and reduce down to that
+        for possibilities in frozenset(remaining_wirings):
+            targets = frozenset.intersection(
+                *(
+                    unscrambled_wires
+                    for unscrambled_wires in UNSCRAMBLED.values()
+                    if len(unscrambled_wires) == len(possibilities)
+                )
+            )
+            for target in targets:
+                combinations[target] &= possibilities
 
         # now where we've figured one exactly then remove it from elsewhere
         for wire, possibilities in combinations.items():
