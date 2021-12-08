@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
 
-
-def load_input(filename):
-    with open(filename) as input_file:
-        for line in input_file:
-            wires, output = line.strip().split(" | ")
-            yield [frozenset(wire) for wire in wires.split()], [
-                frozenset(digit) for digit in output.split()
-            ]
-
+from collections import defaultdict
 
 POSSIBLE_POSITIONS = frozenset("abcdefg")
-UNAMBIGUOUS_DIGITS = frozenset("1478")
 UNSCRAMBLED = {
     "0": frozenset("abcefg"),
     "1": frozenset("cf"),
@@ -24,24 +15,29 @@ UNSCRAMBLED = {
     "8": frozenset("abcdefg"),
     "9": frozenset("abcdfg"),
 }
-INPUT = list(load_input("input.txt"))
+
+# given the number of wires in a wiring, figure out which are the potential
+# unscrambled ones it could be
+OVERLAPS = defaultdict(lambda: set(POSSIBLE_POSITIONS))
+for digit, wires in UNSCRAMBLED.items():
+    OVERLAPS[len(wires)] &= wires
+
+
+def load_input(filename):
+    with open(filename) as input_file:
+        for line in input_file:
+            wires, output = line.strip().split(" | ")
+            yield [frozenset(wire) for wire in wires.split()], [
+                frozenset(digit) for digit in output.split()
+            ]
 
 
 def work_out_mapping(wirings):
     combinations = {wire: set(POSSIBLE_POSITIONS) for wire in POSSIBLE_POSITIONS}
-    remaining_wirings = set(wirings)
     while any(len(possibilities) > 1 for possibilities in combinations.values()):
-        # where the lengths match figure out the common overlaps and reduce down to that
-        for possibilities in frozenset(remaining_wirings):
-            targets = frozenset.intersection(
-                *(
-                    unscrambled_wires
-                    for unscrambled_wires in UNSCRAMBLED.values()
-                    if len(unscrambled_wires) == len(possibilities)
-                )
-            )
-            for target in targets:
-                combinations[target] &= possibilities
+        for scrambled_wiring in wirings:
+            for possible_unscrambled in OVERLAPS[len(scrambled_wiring)]:
+                combinations[possible_unscrambled] &= scrambled_wiring
 
         # now where we've figured one exactly then remove it from elsewhere
         for wire, possibilities in combinations.items():
@@ -74,5 +70,6 @@ def decode(combinations, output):
     return int(decoded)
 
 
-print(f"Part One: {sum(sum(1 for digit in output if len(digit) in (len(UNSCRAMBLED[digit]) for digit in UNAMBIGUOUS_DIGITS)) for _, output in INPUT)}")
+INPUT = list(load_input("input.txt"))
+print(f"Part One: {sum(sum(1 for digit in output if len(digit) in (len(UNSCRAMBLED[digit]) for digit in '1478')) for _, output in INPUT)}")
 print(f"Part Two: {sum(decode(work_out_mapping(wirings), output) for wirings, output in INPUT)}")
