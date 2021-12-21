@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from collections import defaultdict, Counter
-from math import ceil
 
 
 def load_input(filename):
