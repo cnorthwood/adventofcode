@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env pypy3
 
 import re
 
@@ -39,16 +39,19 @@ def will_vel_satisfy(vel, bounds):
         return None
 
 
-def part_one(bounds):
+def calculate(bounds):
+    valid = 0
     max_y = 0
     for y in range(BOUNDS[1][0], BOUNDS[0][1]):
         for x in range(bounds[0][1] + 1):
             y_reached = will_vel_satisfy((x, y), bounds)
             if y_reached is not None:
                 max_y = max(max_y, y_reached)
-    return max_y
+                valid += 1
+    return max_y, valid
 
 
 BOUNDS = load_input("input.txt")
-print(f"Part One: {part_one(BOUNDS)}")
-print(f"Part Two: {sum(1 for y in range(BOUNDS[1][0], BOUNDS[0][1]) for x in range(BOUNDS[0][1] + 1) if will_vel_satisfy((x, y), BOUNDS) is not None)}")
+part_one, part_two = calculate(BOUNDS)
+print(f"Part One: {part_one}")
+print(f"Part Two: {part_two}")
