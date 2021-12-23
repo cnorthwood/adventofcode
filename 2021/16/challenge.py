@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+from math import prod
+
+
 def build_bitstream(hex):
     for c in hex:
         val = int(c, 16)
@@ -23,42 +26,57 @@ def take_sub_bitstream(bitstream, length):
 
 
 def literal_packet(bitstream):
-    n = 0
+    value = 0
     last_packet = False
     while not last_packet:
         last_packet = not read_bits(bitstream, 1)
-        n <<= 4
-        n |= read_bits(bitstream, 4)
-    return 0
+        value <<= 4
+        value |= read_bits(bitstream, 4)
+    return value
 
 
-def unknown_operator(bitstream):
+def parse_subpackets(bitstream, operator):
     version_total = 0
+    values = []
     length_type_id = read_bits(bitstream, 1)
     if length_type_id == 0:
         total_length = read_bits(bitstream, 15)
         sub_bitstream = take_sub_bitstream(bitstream, total_length)
         try:
             while True:
-                version_total += parse_packet(sub_bitstream)
+                sub_version, value = parse_packet(sub_bitstream)
+                version_total += sub_version
+                values.append(value)
         except StopIteration:
             pass
     else:
         num_subpackets = read_bits(bitstream, 11)
         for _ in range(num_subpackets):
-            version_total += parse_packet(bitstream)
-    return version_total
+            sub_version, value = parse_packet(bitstream)
+            version_total += sub_version
+            values.append(value)
+    return version_total, operator(values)
 
 
 PACKET_HANDLERS = {
-    4: literal_packet,
+    0: sum,
+    1: prod,
+    2: min,
+    3: max,
+    5: lambda vs: 1 if vs[0] > vs[1] else 0,
+    6: lambda vs: 1 if vs[0] < vs[1] else 0,
+    7: lambda vs: 1 if vs[0] == vs[1] else 0,
 }
 
 
 def parse_packet(bitstream):
     version = read_bits(bitstream, 3)
     packet_type = read_bits(bitstream, 3)
-    return version + PACKET_HANDLERS.get(packet_type, unknown_operator)(bitstream)
+    if packet_type == 4:
+        return version, literal_packet(bitstream)
+    else:
+        version_sum, value = parse_subpackets(bitstream, PACKET_HANDLERS[packet_type])
+        return version + version_sum, value
 
 
 def parse(raw):
@@ -69,4 +87,7 @@ def parse(raw):
 with open("input.txt") as input_file:
     INPUT = input_file.read().strip()
 
-print(f"Part One: {parse(INPUT)}")
+
+part_one, part_two = parse(INPUT)
+print(f"Part One: {part_one}")
+print(f"Part Two: {part_two}")
