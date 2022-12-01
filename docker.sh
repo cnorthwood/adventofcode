@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE=cnorthwood/adventofcode:2020.2
+IMAGE=cnorthwood/adventofcode:$(git log -n 1 --pretty=format:%h -- docker/Dockerfile docker/entrypoint.sh)
 
 docker image inspect $IMAGE >/dev/null 2>&1
 if [ $? -ne 0 ]
