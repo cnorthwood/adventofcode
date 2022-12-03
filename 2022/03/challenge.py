@@ -8,15 +8,9 @@ def compartmentalise(bags):
         yield bag[:len(bag)//2], bag[len(bag)//2:]
 
 
-def find_duplicate(pair):
-    return set(pair[0]) & set(pair[1])
-
-
 def priority(item):
-    if item in string.ascii_lowercase:
-        return ord(item) - 96
-    else:
-        return ord(item) - 38
+    val = ord(item)
+    return val - 96 if val > 96 else val - 38
 
 
 def chunk(bags):
@@ -31,5 +25,5 @@ def find_unique(group):
 with open("input.txt") as input_file:
     INPUT = [line.strip() for line in input_file.readlines()]
 
-print(f"Part One: {sum(priority(item) for item in chain.from_iterable(find_duplicate(pair) for pair in compartmentalise(INPUT)))}")
+print(f"Part One: {sum(priority(item) for item in chain.from_iterable(find_unique(pair) for pair in compartmentalise(INPUT)))}")
 print(f"Part Two: {sum(priority(item) for item in chain.from_iterable(find_unique(group) for group in chunk(INPUT)))}")
