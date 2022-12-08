@@ -11,4 +11,4 @@ with open("input.txt") as input_file:
 
 
 print(f"Part One: {find_start_of_message_marker(INPUT, 4)}")
-print(f"Part One: {find_start_of_message_marker(INPUT, 14)}")
+print(f"Part Two: {find_start_of_message_marker(INPUT, 14)}")
