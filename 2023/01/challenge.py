@@ -21,7 +21,8 @@ def extract_digits(line):
 
 
 def extract_wordy_digits(line):
-    match = re.findall(r"(?=(zero|one|two|three|four|five|six|seven|eight|nine|\d))", line)
+    # the answers can overlap, so let's use the negative lookahead operator to make sure we don't consume when we match
+    match = re.findall(r"(?=(one|two|three|four|five|six|seven|eight|nine|\d))", line)
     return int(VALUES.get(match[0], match[0]) + VALUES.get(match[-1], match[-1]))
 
 
