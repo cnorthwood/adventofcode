@@ -1,0 +1,11 @@
+version: 1
+author: laser
+language: Python
+dockerfile: docker/Dockerfile
+code: /code
+workdir: /code/%year%/%zeroday%
+cmd: python3 challenge.py
+runonce: python3 -m compileall
+daypath: %year%/%zeroday%
+inputfile: %year%/%zeroday%/input.txt
+answerfile: %year%/%zeroday%/answers.txt
