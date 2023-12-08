@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from itertools import cycle
+from math import lcm
 import re
 
 
@@ -15,22 +16,18 @@ def load_input(filename):
     return instructions, nodes
 
 
-def follow_instructions(instructions, nodes, target="ZZZ"):
-    location = "AAA"
+def follow_instructions(instructions, nodes, start="AAA", target_func=lambda location: location == "ZZZ"):
+    location = start
     for steps, instruction in enumerate(cycle(instructions)):
-        if location == target:
+        if target_func(location):
             return steps
         location = nodes[location][instruction]
 
 
 def ghost_behaviour(instructions, nodes):
-    locations = [location for location in nodes.keys() if location[-1] == "A"]
-    for steps, instruction in enumerate(cycle(instructions)):
-        if all(location[-1] == "Z" for location in locations):
-            return steps
-        locations = [nodes[location][instruction] for location in locations]
+    return lcm(*(follow_instructions(instructions, nodes, start, lambda location: location[-1] == "Z") for start in nodes.keys() if start[-1] == "A"))
 
 
 INSTRUCTIONS, NODES = load_input("input.txt")
 print(f"Part One: {follow_instructions(INSTRUCTIONS, NODES)}")
-# print(f"Part Two: {ghost_behaviour(INSTRUCTIONS, NODES)}")
+print(f"Part Two: {ghost_behaviour(INSTRUCTIONS, NODES)}")
