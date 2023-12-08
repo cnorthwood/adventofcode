@@ -11,4 +11,4 @@ then
     cd ..
 fi
 
-docker run --rm -it -v $(pwd):/code $IMAGE /entrypoint.sh $@
+docker run --rm -v $(pwd):/code $IMAGE /entrypoint.sh $@
