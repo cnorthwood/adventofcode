@@ -4,7 +4,7 @@ language: Python
 dockerfile: docker/Dockerfile
 code: /code
 workdir: /code/%year%/%zeroday%
-cmd: python3 -S challenge.py
+cmd: ./challenge.py
 runonce: python3 -m compileall
 daypath: %year%/%zeroday%
 inputfile: %year%/%zeroday%/input.txt
