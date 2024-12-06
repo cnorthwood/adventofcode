@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 -S
 
 with open("input.txt") as input_file:
     GRID = list(line.strip() for line in input_file)

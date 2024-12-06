@@ -14,7 +14,7 @@ if [ -d "/code/${YEAR}/`printf %02d $DAY`/" ]; then
     elif [ -f "challenge2.py" ] ; then
         time sh -c './challenge.py; ./challenge2.py'
     elif [ -f "challenge.py" ] ; then
-        sh -c 'time python3 -S ./challenge.py'
+        sh -c 'time ./challenge.py'
     elif [ -f "code.py" ] ; then
         sh -c 'time ./code.py'
     elif [ -f "challenge.js" ] ; then
