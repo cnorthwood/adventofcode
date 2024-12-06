@@ -56,8 +56,29 @@ def covered_steps(pos, obstacles, grid_limits):
     while in_grid(pos, grid_limits):
         visited.add(pos[0])
         pos = next_pos(pos, obstacles)
-    return len(visited)
+    return visited
+
+
+def will_loop(pos, obstacles, grid_limits):
+    visited = set()
+    while pos not in visited:
+        visited.add(pos)
+        pos = next_pos(pos, obstacles)
+        if not in_grid(pos, grid_limits):
+            return False
+    return True
+
+
+def possible_obstacle_placements(start_pos, obstacles, places_to_try, grid_limits):
+    looping_obstacles = set()
+    places_to_try = {pos for pos in places_to_try if pos != start_pos[0]}
+    for place_to_try in places_to_try:
+        if will_loop(start_pos, obstacles | {place_to_try}, grid_limits):
+            looping_obstacles.add(place_to_try)
+    return len(looping_obstacles)
 
 
 START_POS, OBSTACLES, GRID_LIMITS = load_map("input.txt")
-print(f"Part One: {covered_steps(START_POS, OBSTACLES, GRID_LIMITS)}")
+VISITED_STEPS = covered_steps(START_POS, OBSTACLES, GRID_LIMITS)
+print(f"Part One: {len(VISITED_STEPS)}")
+print(f"Part Two: {possible_obstacle_placements(START_POS, OBSTACLES, VISITED_STEPS, GRID_LIMITS)}")
