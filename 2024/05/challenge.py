@@ -1,4 +1,4 @@
-#!/usr/bin/env pypy3 -S
+#!/usr/bin/env -S pypy3 -S
 
 from itertools import filterfalse, permutations
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -S
+#!/usr/bin/env -S python3 -S
 
 from collections import Counter
 

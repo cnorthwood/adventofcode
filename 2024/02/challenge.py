@@ -1,4 +1,4 @@
-#!/usr/bin/env python3 -S
+#!/usr/bin/env -S python3 -S
 
 def all_descending(ns):
     return all(a > b for a, b in zip(ns, ns[1:]))
