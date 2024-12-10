@@ -1,7 +1,5 @@
 #!/usr/bin/env -S pypy3 -S
 
-from pprint import pprint
-
 
 def build_disk_layout(layout):
     contents = [0] * layout[0]
