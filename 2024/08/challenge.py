@@ -11,12 +11,10 @@ def load_input(input_filename):
             for x, c in enumerate(line.strip()):
                 if c != ".":
                     antenna_locations[c].add((x, y))
-    return antenna_locations
+    return antenna_locations, x, y
 
 
-ANTENNA_LOCATIONS = load_input("input.txt")
-MAX_X = max(max(loc[0] for loc in locations) for locations in ANTENNA_LOCATIONS.values())
-MAX_Y = max(max(loc[1] for loc in locations) for locations in ANTENNA_LOCATIONS.values())
+ANTENNA_LOCATIONS, MAX_X, MAX_Y = load_input("input.txt")
 
 
 def node_in_bounds(node):
