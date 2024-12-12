@@ -1,4 +1,4 @@
-#!/usr/bin/env -S pypy3 -S
+#!/usr/bin/env -S python3 -S
 
 from enum import Enum
 
