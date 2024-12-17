@@ -1,4 +1,6 @@
 #!/usr/bin/env -S python3 -S
+from math import inf
+
 
 def load_input(input_filename):
     a = None
@@ -19,7 +21,7 @@ def load_input(input_filename):
     return program, a, b, c
 
 
-def main(program, init_a, init_b, init_c):
+def main(init_a, init_b, init_c):
     state = {
         "ip": 0,
         "a": init_a,
@@ -83,9 +85,27 @@ def main(program, init_a, init_b, init_c):
         7: cdv,
     }
 
-    while 0 <= state["ip"] < len(program):
-        operators[program[state["ip"]]](program[state["ip"] + 1])
+    while 0 <= state["ip"] < len(PROGRAM):
+        operators[PROGRAM[state["ip"]]](PROGRAM[state["ip"] + 1])
 
-    return ",".join(map(str, state["output"]))
+    return state["output"]
 
-print(f"Part One: {main(*load_input('input.txt'))}")
+# nfc what this does, basically stolen from https://github.com/categoraal/adventofcode2024/blob/main/day17.py
+def part2(test_seed=0, program_i=15):
+    possibilities = [inf]
+    if program_i == -1:
+        return test_seed
+
+    for i in range(8):
+        test_a = test_seed + i * 8 ** program_i
+        output = main(init_a=test_a, init_b=0, init_c=0)
+        if len(output) != len(PROGRAM):
+            continue
+        if output[program_i] == PROGRAM[program_i]:
+            possibilities.append(part2(test_a, program_i - 1))
+    return min(possibilities)
+
+
+PROGRAM, INIT_A, INIT_B, INIT_C = load_input("input.txt")
+print(f"Part One: {','.join(map(str,main(INIT_A, INIT_B, INIT_C)))}")
+print(f"Part Two: {part2()}")
