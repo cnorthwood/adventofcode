@@ -1,4 +1,5 @@
 #!/usr/bin/env -S python3 -S
+
 import re
 
 A_COST = 3
