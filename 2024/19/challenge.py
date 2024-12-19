@@ -11,12 +11,14 @@ def load_input(input_filename):
 
 
 @cache
-def valid_combo(combo):
+def arrangements_for_combo(combo):
     if combo == "":
-        return True
+        return 1
     else:
-        return any(valid_combo(combo[len(towel):]) for towel in TOWELS if combo.startswith(towel))
+        return sum(arrangements_for_combo(combo[len(towel):]) for towel in TOWELS if combo.startswith(towel))
 
 
 TOWELS, COMBOS = load_input("input.txt")
-print(f"Part One: {sum(1 for combo in COMBOS if valid_combo(combo))}")
+VALID_ARRANGEMENTS = {combo: arrangements_for_combo(combo) for combo in COMBOS}
+print(f"Part One: {sum(1 for n in VALID_ARRANGEMENTS.values() if n > 0)}")
+print(f"Part Two: {sum(VALID_ARRANGEMENTS.values())}")
