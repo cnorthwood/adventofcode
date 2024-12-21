@@ -74,25 +74,35 @@ def backtrack(target, costs):
     return path
 
 
-def generate_glitches(coord, valid_route):
-    for glitch_step1 in generate_neighbours(coord):
-        for glitch_step2 in generate_neighbours(glitch_step1):
-            if glitch_step2 in valid_route:
-                yield (glitch_step1, glitch_step2)
+@cache
+def generate_cheats(coord, valid_route, cheat_length):
+    cheat_ends = set()
+    if coord in valid_route:
+        cheat_ends.add(coord)
+    if cheat_length > 0:
+        for cheat_step in generate_neighbours(coord):
+            cheat_ends |= generate_cheats(cheat_step, valid_route, cheat_length - 1)
+    return cheat_ends
 
 
-def part1(start, target, valid_squares):
+def manhattan(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+
+def time_saved(costs, cheat_start, cheat_end):
+    return costs[cheat_end] - costs[cheat_start] - manhattan(cheat_start, cheat_end)
+
+
+
+def main(start, target, valid_squares, cheat_length, good_cheat_threshold=100):
     costs = dijkstra(start, valid_squares)
     path = backtrack(target, costs)
-    valid_route = set(path)
+    valid_route = frozenset(path)
 
-    good_glitches = set()
-    for coord in path:
-        for glitch_step1, glitch_step2 in generate_glitches(coord, valid_route):
-            if costs[glitch_step2] - costs[coord] > 100:
-                good_glitches.add((glitch_step1, glitch_step2))
-    return len(good_glitches)
+    good_cheats = {(cheat_start, cheat_end) for cheat_start in valid_route for cheat_end in generate_cheats(cheat_start, valid_route, cheat_length) if time_saved(costs, cheat_start, cheat_end) >= good_cheat_threshold}
+    return len(good_cheats)
 
 
 START, TARGET, VALID_SQUARES = load_input("input.txt")
-print(f"Part One: {part1(START, TARGET, VALID_SQUARES)}")
+print(f"Part One: {main(START, TARGET, VALID_SQUARES, cheat_length=2)}")
+print(f"Part Two: {main(START, TARGET, VALID_SQUARES, cheat_length=20)}")
