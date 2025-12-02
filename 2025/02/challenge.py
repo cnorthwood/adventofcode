@@ -12,13 +12,10 @@ def is_repeating(s, n):
     return s == s[:len(s) // n] * n
 
 
-
 def invalid_ids_part_one(r):
     for i in range(r[0], r[1] + 1):
         s = str(i)
-        if len(s) % 2 != 0:
-            continue
-        if is_repeating(s, 2):
+        if len(s) % 2 == 0 and is_repeating(s, 2):
             yield i
 
 
@@ -34,10 +31,8 @@ def factors(n):
 def invalid_ids_part_two(r):
     for i in range(r[0], r[1] + 1):
         s = str(i)
-        for factor in factors(len(s)):
-            if is_repeating(s, factor):
-                yield i
-                break
+        if any(is_repeating(s, factor) for factor in factors(len(s))):
+            yield i
 
 
 # print(sum(sum(invalid_ids_part_two(r)) for r in load_input('test.txt')))
