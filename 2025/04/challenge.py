@@ -44,5 +44,5 @@ def unremoveable(locations):
 
 
 ROLL_LOCATIONS = load_input("input.txt")
-print(f"Part One: {sum(1 for position in ROLL_LOCATIONS if num_neighbours(position, ROLL_LOCATIONS) < 4)}")
+print(f"Part One: {len(removable_rolls(ROLL_LOCATIONS))}")
 print(f"Part Two: {len(ROLL_LOCATIONS) - len(unremoveable(ROLL_LOCATIONS))}")
