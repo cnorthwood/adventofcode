@@ -10,8 +10,12 @@ def load_input(filename):
         return {tuple(int(coord) for coord in line.strip().split(",")) for line in input_file.readlines()}
 
 
-def generate_network_id():
-    yield from count()
+def init_network(coords):
+    return {coord: None for coord in coords}, count()
+
+
+def closest_pairs(coords):
+    return sorted(combinations(coords, 2), key=lambda pair: dist(*pair))
 
 
 def connect_circuit(a, b, networks, network_id_generator):
@@ -29,25 +33,27 @@ def connect_circuit(a, b, networks, network_id_generator):
                 networks[coord] = merge_target
 
 
-def part_one(coords, n=1000):
-    network_id_generator = generate_network_id()
-    networks = {coord: None for coord in coords}
-    for a, b in sorted(combinations(coords, 2), key=lambda pair: dist(*pair))[:n]:
-        connect_circuit(a, b, networks, network_id_generator)
-
+def partition_networks(networks):
     clusters = defaultdict(set)
     for coord, network_id in networks.items():
         if network_id is None:
             continue
         clusters[network_id].add(coord)
-    cluster_sizes = [len(cluster) for cluster in clusters.values()]
-    return prod(sorted(cluster_sizes, reverse=True)[:3])
+    return clusters.values()
+
+
+def part_one(coords, n=1000):
+    networks, network_id_generator = init_network(coords)
+    for a, b in closest_pairs(coords)[:n]:
+        connect_circuit(a, b, networks, network_id_generator)
+
+    network_sizes = [len(network) for network in partition_networks(networks)]
+    return prod(sorted(network_sizes, reverse=True)[:3])
 
 
 def part_two(coords):
-    network_id_generator = generate_network_id()
-    networks = {coord: None for coord in coords}
-    for a, b in sorted(combinations(coords, 2), key=lambda pair: dist(*pair)):
+    networks, network_id_generator = init_network(coords)
+    for a, b in closest_pairs(coords):
         connect_circuit(a, b, networks, network_id_generator)
         if len(set(networks.values())) == 1:
             return a[0] * b[0]
@@ -56,4 +62,4 @@ def part_two(coords):
 # print(f"Test: {part_two(load_input('test.txt'))}")
 INPUT = load_input("input.txt")
 print(f"Part One: {part_one(INPUT)}")
-print(f"Part One: {part_two(INPUT)}")
+print(f"Part Two: {part_two(INPUT)}")
