@@ -12,28 +12,29 @@ def load_input(filename):
 
 def generate_network_id():
     yield from count()
-NETWORK_ID_GENERATOR = generate_network_id()
 
 
-def connect_networks(coords, n=1000):
+def connect_circuit(a, b, networks, network_id_generator):
+    if networks[a] is None and networks[b] is None:
+        networks[a] = networks[b] = next(network_id_generator)
+    elif networks[a] is not None and networks[b] is None:
+        networks[b] = networks[a]
+    elif networks[a] is None and networks[b] is not None:
+        networks[a] = networks[b]
+    else:
+        merge_target = networks[a]
+        merge_from = networks[b]
+        for coord in networks.keys():
+            if networks[coord] == merge_from:
+                networks[coord] = merge_target
+
+
+def part_one(coords, n=1000):
+    network_id_generator = generate_network_id()
     networks = {coord: None for coord in coords}
     for a, b in sorted(combinations(coords, 2), key=lambda pair: dist(*pair))[:n]:
-        if networks[a] is None and networks[b] is None:
-            networks[a] = networks[b] = next(NETWORK_ID_GENERATOR)
-        elif networks[a] is not None and networks[b] is None:
-            networks[b] = networks[a]
-        elif networks[a] is None and networks[b] is not None:
-            networks[a] = networks[b]
-        else:
-            merge_target = networks[a]
-            merge_from = networks[b]
-            for coord in networks.keys():
-                if networks[coord] == merge_from:
-                    networks[coord] = merge_target
-    return networks
+        connect_circuit(a, b, networks, network_id_generator)
 
-
-def part_one(networks):
     clusters = defaultdict(set)
     for coord, network_id in networks.items():
         if network_id is None:
@@ -43,5 +44,16 @@ def part_one(networks):
     return prod(sorted(cluster_sizes, reverse=True)[:3])
 
 
-# print(f"Test: {part_one(connect_networks(load_input('test.txt'), n=10))}")
-print(f"Part One: {part_one(connect_networks(load_input('input.txt')))}")
+def part_two(coords):
+    network_id_generator = generate_network_id()
+    networks = {coord: None for coord in coords}
+    for a, b in sorted(combinations(coords, 2), key=lambda pair: dist(*pair)):
+        connect_circuit(a, b, networks, network_id_generator)
+        if len(set(networks.values())) == 1:
+            return a[0] * b[0]
+
+
+# print(f"Test: {part_two(load_input('test.txt'))}")
+INPUT = load_input("input.txt")
+print(f"Part One: {part_one(INPUT)}")
+print(f"Part One: {part_two(INPUT)}")
