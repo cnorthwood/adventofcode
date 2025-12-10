@@ -16,7 +16,7 @@ def load_input(filename):
 
             desired_indicators = tuple([{".": False, "#": True}[c] for c in match.group("desired_indicators")])
             buttons = {frozenset({int(d) for d in button_actions.strip("()").split(",")}) for button_actions in match.group("buttons").split()}
-            joltages = [int(d) for d in match.group("joltages").split(",")]
+            joltages = tuple([int(d) for d in match.group("joltages").split(",")])
 
             yield desired_indicators, buttons, joltages
 
@@ -26,7 +26,7 @@ def toggle(indicators, button):
     return tuple(not state if i in button else state for i, state in enumerate(indicators))
 
 
-def min_pushes(desired_indicators, buttons):
+def min_indicator_pushes(desired_indicators, buttons):
     queue = deque([(0, tuple([False] * len(desired_indicators)))])
 
     while nextq := queue.popleft():
@@ -43,5 +43,27 @@ def min_pushes(desired_indicators, buttons):
             queue.append((n, next_state))
 
 
-INPUT = list(load_input("input.txt"))
-print(f"Part One: {sum(min_pushes(desired_indicators, buttons) for desired_indicators, buttons, _ in INPUT)}")
+def joltage_push(current_state, button):
+    return tuple(current_value + (1 if i in button else 0) for i, current_value in enumerate(current_state))
+
+
+def min_joltage_pushes(desired_joltage, buttons):
+    queue = deque([(0, tuple([0] * len(desired_joltage)))])
+
+    while nextq := queue.popleft():
+        n, current_state = nextq
+        n += 1
+
+        for button in buttons:
+            next_state = joltage_push(current_state, button)
+            if any(state > desired for state, desired in zip(next_state, desired_joltage)):
+                # we can never decrease a joltage so this is an unrecoverable state
+                continue
+            if next_state == desired_joltage:
+                return n
+            queue.append((n, next_state))
+
+
+INPUT = list(load_input("test.txt"))
+# print(f"Part One: {sum(min_indicator_pushes(desired_indicators, buttons) for desired_indicators, buttons, _ in INPUT)}")
+print(f"Part Two: {sum(min_joltage_pushes(desired_joltage, buttons) for _, buttons, desired_joltage in INPUT)}")
