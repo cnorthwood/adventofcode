@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from collections import deque
+from functools import cache
 
 
 def load_input(filename):
@@ -12,23 +12,16 @@ def load_input(filename):
     return graph
 
 
-INPUT = load_input("input.txt")
+GRAPH = load_input("input.txt")
 
 
-def find_paths(graph, start="you", end="out"):
-    complete_paths = set()
-    current_threads = {(start,)}
-
-    while len(current_threads) > 0:
-        thread = current_threads.pop()
-        if thread[-1] == end:
-            complete_paths.add(thread)
-            continue
-
-        for next_link in graph[thread[-1]]:
-            current_threads.add(thread + (next_link,))
-
-    return len(complete_paths)
+@cache
+def find_paths_from(start, end):
+    if start == end:
+        return 1
+    else:
+        return sum(find_paths_from(next_step, end) for next_step in GRAPH.get(start, []))
 
 
-print(f"Part One: {find_paths(INPUT)}")
+print(f"Part One: {find_paths_from('you', 'out')}")
+print(f"Part Two: {find_paths_from('svr', 'fft') * find_paths_from('fft', 'dac') * find_paths_from('dac', 'out')}")
