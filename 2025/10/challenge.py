@@ -1,8 +1,10 @@
-#!/usr/bin/env pypy3
+#!/usr/bin/env python3
 
 from collections import deque
 from functools import cache
+import numpy as np
 import re
+from scipy.optimize import milp, LinearConstraint, Bounds
 
 
 MACHINE_LINE_RE = re.compile(r'\[(?P<desired_indicators>[\.\#]+)\] (?P<buttons>(\((\d+,)*\d+\) )+)\{(?P<joltages>(\d+,)*\d+)\}')
@@ -48,22 +50,25 @@ def joltage_push(current_state, button):
 
 
 def min_joltage_pushes(desired_joltage, buttons):
-    queue = deque([(0, tuple([0] * len(desired_joltage)))])
+    # Build matrix: A[j][i] = 1 if button i affects output j
+    effects_matrix = np.zeros((len(desired_joltage), len(buttons)))
+    for i, button in enumerate(buttons):
+        for j in button:
+            effects_matrix[j, i] = 1
 
-    while nextq := queue.popleft():
-        n, current_state = nextq
-        n += 1
+    target = np.array(desired_joltage)
 
-        for button in buttons:
-            next_state = joltage_push(current_state, button)
-            if any(state > desired for state, desired in zip(next_state, desired_joltage)):
-                # we can never decrease a joltage so this is an unrecoverable state
-                continue
-            if next_state == desired_joltage:
-                return n
-            queue.append((n, next_state))
+    # Minimize sum(x) subject to Ax = b, x >= 0, x integer
+    c = np.ones(len(buttons))  # minimize sum of x
+    constraints = LinearConstraint(effects_matrix, target, target)  # Ax = b
+    bounds = Bounds(lb=0, ub=np.inf)
+    integrality = np.ones(len(buttons))
+
+    result = milp(c, constraints=constraints, bounds=bounds, integrality=integrality)
+
+    return int(round(result.fun))
 
 
-INPUT = list(load_input("test.txt"))
-# print(f"Part One: {sum(min_indicator_pushes(desired_indicators, buttons) for desired_indicators, buttons, _ in INPUT)}")
+INPUT = list(load_input("input.txt"))
+print(f"Part One: {sum(min_indicator_pushes(desired_indicators, buttons) for desired_indicators, buttons, _ in INPUT)}")
 print(f"Part Two: {sum(min_joltage_pushes(desired_joltage, buttons) for _, buttons, desired_joltage in INPUT)}")
